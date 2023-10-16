@@ -1,0 +1,95 @@
+package deprecated
+
+import (
+	"testing"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/chnsz/golangsdk"
+	"github.com/chnsz/golangsdk/openstack/networking/v2/extensions/vpnaas/services"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+)
+
+func TestAccVpnServiceV2_basic(t *testing.T) {
+	var service services.Service
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { acceptance.TestAccPreCheckDeprecated(t) },
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      testAccCheckVpnServiceV2Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVpnServiceV2_basic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVpnServiceV2Exists(
+						"hcso_vpnaas_service_v2.service_1", &service),
+					resource.TestCheckResourceAttrPtr("hcso_vpnaas_service_v2.service_1", "router_id", &service.RouterID),
+					resource.TestCheckResourceAttr("hcso_vpnaas_service_v2.service_1", "admin_state_up", "true"),
+				),
+			},
+		},
+	})
+}
+
+func testAccCheckVpnServiceV2Destroy(s *terraform.State) error {
+	config := acceptance.TestAccProvider.Meta().(*config.Config)
+	networkingClient, err := config.NetworkingV2Client(acceptance.HCSO_REGION_NAME)
+	if err != nil {
+		return fmtp.Errorf("Error creating HuaweiCloud networking client: %s", err)
+	}
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "hcso_vpnaas_service" {
+			continue
+		}
+		_, err = services.Get(networkingClient, rs.Primary.ID).Extract()
+		if err == nil {
+			return fmtp.Errorf("Service (%s) still exists.", rs.Primary.ID)
+		}
+		if _, ok := err.(golangsdk.ErrDefault404); !ok {
+			return err
+		}
+	}
+	return nil
+}
+
+func testAccCheckVpnServiceV2Exists(n string, serv *services.Service) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmtp.Errorf("Not found: %s", n)
+		}
+
+		if rs.Primary.ID == "" {
+			return fmtp.Errorf("No ID is set")
+		}
+
+		config := acceptance.TestAccProvider.Meta().(*config.Config)
+		networkingClient, err := config.NetworkingV2Client(acceptance.HCSO_REGION_NAME)
+		if err != nil {
+			return fmtp.Errorf("Error creating HuaweiCloud networking client: %s", err)
+		}
+
+		var found *services.Service
+
+		found, err = services.Get(networkingClient, rs.Primary.ID).Extract()
+		if err != nil {
+			return err
+		}
+		*serv = *found
+
+		return nil
+	}
+}
+
+const testAccVpnServiceV2_basic = `
+data "hcso_vpc" "test" {
+  name = "vpc-default"
+}
+
+resource "hcso_vpnaas_service_v2" "service_1" {
+  name      = "vpngw-acctest"
+  router_id = data.hcso_vpc.test.id
+}
+`

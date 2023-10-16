@@ -1,0 +1,96 @@
+package waf
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/chnsz/golangsdk/openstack/waf_hw/v1/pools"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
+)
+
+func TestAccWafInsGroupAssociate_basic(t *testing.T) {
+	var group pools.Pool
+	resourceName := "hcso_waf_instance_group_associate.group_associate"
+	name := acceptance.RandomAccResourceName()
+
+	rc := acceptance.InitResourceCheck(
+		resourceName,
+		&group,
+		getWafInstanceGroupFunc,
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+			// The WAF group APIs do not support general user usage. Skip the WAF group test.
+			acceptance.TestAccPrecheckWafInstance(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccWafInsGroupAssociate_conf(name),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "load_balancers.#", "1"),
+					acceptance.TestCheckResourceAttrWithVariable(resourceName, "load_balancers.0",
+						"${hcso_elb_loadbalancer.elb.id}"),
+					acceptance.TestCheckResourceAttrWithVariable(resourceName,
+						"group_id", "${hcso_waf_instance_group.group_1.id}"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func testAccWafInsGroupAssociate_conf(name string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+resource "hcso_waf_instance_group" "group_1" {
+  name   = "%[2]s"
+  vpc_id = hcso_vpc.test.id
+}
+
+resource "hcso_waf_dedicated_instance" "instance_1" {
+  name               = "%[2]s"
+  available_zone     = data.hcso_availability_zones.test.names[1]
+  specification_code = "waf.instance.professional"
+  ecs_flavor         = data.hcso_compute_flavors.test.ids[0]
+  vpc_id             = hcso_vpc.test.id
+  subnet_id          = hcso_vpc_subnet.test.id
+  group_id           = hcso_waf_instance_group.group_1.id
+  
+  security_group = [
+    hcso_networking_secgroup.test.id
+  ]
+}
+
+resource "hcso_elb_loadbalancer" "elb" {
+  name              = "%[2]s"
+  vpc_id            = hcso_vpc.test.id
+  cross_vpc_backend = true
+  ipv4_subnet_id    = hcso_vpc_subnet.test.ipv4_subnet_id
+
+  availability_zone = [
+    data.hcso_availability_zones.test.names[0],
+    data.hcso_availability_zones.test.names[1]
+  ]
+}
+
+resource "hcso_waf_instance_group_associate" "group_associate" {
+  group_id       = hcso_waf_instance_group.group_1.id
+  load_balancers = [hcso_elb_loadbalancer.elb.id]
+
+  depends_on = [hcso_waf_dedicated_instance.instance_1]
+}
+`, common.TestBaseComputeResources(name), name)
+}

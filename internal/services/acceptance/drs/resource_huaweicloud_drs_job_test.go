@@ -1,0 +1,217 @@
+package drs
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/chnsz/golangsdk/openstack/drs/v3/jobs"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+)
+
+func getDrsJobResourceFunc(config *config.Config, state *terraform.ResourceState) (interface{}, error) {
+	client, err := config.DrsV3Client(acceptance.HCSO_REGION_NAME)
+	if err != nil {
+		return nil, fmtp.Errorf("error creating DRS client, err=%s", err)
+	}
+	return jobs.Get(client, jobs.QueryJobReq{Jobs: []string{state.Primary.ID}})
+}
+
+func TestAccResourceDrsJob_basic(t *testing.T) {
+	var obj jobs.BatchCreateJobReq
+	resourceName := "hcso_drs_job.test"
+	name := acceptance.RandomAccResourceName()
+	dbName := acceptance.RandomAccResourceName()
+	updateName := acceptance.RandomAccResourceName()
+	pwd := "TestDrs@123"
+
+	rc := acceptance.InitResourceCheck(
+		resourceName,
+		&obj,
+		getDrsJobResourceFunc,
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { acceptance.TestAccPreCheck(t) },
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDrsJob_migrate_mysql(name, dbName, pwd),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "type", "migration"),
+					resource.TestCheckResourceAttr(resourceName, "direction", "up"),
+					resource.TestCheckResourceAttr(resourceName, "net_type", "eip"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db_readnoly", "true"),
+					resource.TestCheckResourceAttr(resourceName, "migration_type", "FULL_INCR_TRANS"),
+					resource.TestCheckResourceAttr(resourceName, "description", name),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.engine_type", "mysql"),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.ip", "192.168.0.58"),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.port", "3306"),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.user", "root"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.engine_type", "mysql"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.ip", "192.168.0.59"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.port", "3306"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.user", "root"),
+					resource.TestCheckResourceAttrPair(resourceName, "destination_db.0.subnet_id",
+						"hcso_vpc_subnet.test", "id"),
+					resource.TestCheckResourceAttrPair(resourceName, "destination_db.0.instance_id",
+						"hcso_rds_instance.test2", "id"),
+					resource.TestCheckResourceAttrPair(resourceName, "destination_db.0.region",
+						"hcso_rds_instance.test2", "region"),
+					resource.TestCheckResourceAttrSet(resourceName, "status"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
+					resource.TestCheckResourceAttrSet(resourceName, "private_ip"),
+				),
+			},
+			{
+				Config: testAccDrsJob_migrate_mysql(updateName, dbName, pwd),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", updateName),
+					resource.TestCheckResourceAttr(resourceName, "type", "migration"),
+					resource.TestCheckResourceAttr(resourceName, "direction", "up"),
+					resource.TestCheckResourceAttr(resourceName, "net_type", "eip"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db_readnoly", "true"),
+					resource.TestCheckResourceAttr(resourceName, "migration_type", "FULL_INCR_TRANS"),
+					resource.TestCheckResourceAttr(resourceName, "description", updateName),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.engine_type", "mysql"),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.ip", "192.168.0.58"),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.port", "3306"),
+					resource.TestCheckResourceAttr(resourceName, "source_db.0.user", "root"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.engine_type", "mysql"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.ip", "192.168.0.59"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.port", "3306"),
+					resource.TestCheckResourceAttr(resourceName, "destination_db.0.user", "root"),
+					resource.TestCheckResourceAttrPair(resourceName, "destination_db.0.subnet_id",
+						"hcso_vpc_subnet.test", "id"),
+					resource.TestCheckResourceAttrPair(resourceName, "destination_db.0.instance_id",
+						"hcso_rds_instance.test2", "id"),
+					resource.TestCheckResourceAttrPair(resourceName, "destination_db.0.region",
+						"hcso_rds_instance.test2", "region"),
+					resource.TestCheckResourceAttrSet(resourceName, "status"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
+					resource.TestCheckResourceAttrSet(resourceName, "private_ip"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{"source_db.0.password", "destination_db.0.password",
+					"expired_days", "migrate_definer", "force_destroy"},
+			},
+		},
+	})
+}
+
+func testAccDrsJob_mysql(index int, name, pwd, ip string) string {
+	return fmt.Sprintf(`
+resource "hcso_rds_instance" "test%d" {
+  depends_on = [
+    hcso_networking_secgroup_rule.ingress,
+    hcso_networking_secgroup_rule.egress,
+  ]
+  name                = "%s%d"
+  flavor              = "rds.mysql.sld4.large.ha"
+  security_group_id   = hcso_networking_secgroup.test.id
+  subnet_id           = hcso_vpc_subnet.test.id
+  vpc_id              = hcso_vpc.test.id
+  fixed_ip            = "%s"
+  ha_replication_mode = "semisync"
+
+  availability_zone = [
+    data.hcso_availability_zones.test.names[0],
+    data.hcso_availability_zones.test.names[3],
+  ]
+
+  db {
+    password = "%s"
+    type     = "MySQL"
+    version  = "5.7"
+    port     = 3306
+  }
+
+  volume {
+    type = "LOCALSSD"
+    size = 40
+  }
+}
+`, index, name, index, ip, pwd)
+}
+
+func testAccDrsJob_migrate_mysql(name, dbName, pwd string) string {
+	netConfig := common.TestBaseNetwork(name)
+	sourceDb := testAccDrsJob_mysql(1, dbName, pwd, "192.168.0.58")
+	destDb := testAccDrsJob_mysql(2, dbName, pwd, "192.168.0.59")
+
+	return fmt.Sprintf(`
+%s
+
+resource "hcso_networking_secgroup_rule" "ingress" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  ports             = 3306
+  protocol          = "tcp"
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = hcso_networking_secgroup.test.id
+}
+
+resource "hcso_networking_secgroup_rule" "egress" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = hcso_networking_secgroup.test.id
+}
+
+data "hcso_availability_zones" "test" {}
+
+%s
+%s
+
+resource "hcso_drs_job" "test" {
+  name           = "%s"
+  type           = "migration"
+  engine_type    = "mysql"
+  direction      = "up"
+  net_type       = "eip"
+  migration_type = "FULL_INCR_TRANS"
+  description    = "%s"
+  force_destroy  = true
+
+  source_db {
+    engine_type = "mysql"
+    ip          = hcso_rds_instance.test1.fixed_ip
+    port        = 3306
+    user        = "root"
+    password    = "%s"
+  }
+
+
+  destination_db {
+    region      = hcso_rds_instance.test2.region
+    ip          = hcso_rds_instance.test2.fixed_ip
+    port        = 3306
+    engine_type = "mysql"
+    user        = "root"
+    password    = "%s"
+    instance_id = hcso_rds_instance.test2.id
+    subnet_id   = hcso_rds_instance.test2.subnet_id
+  }
+
+  lifecycle {
+    ignore_changes = [
+      source_db.0.password, destination_db.0.password, force_destroy,
+    ]
+  }
+}
+`, netConfig, sourceDb, destDb, name, name, pwd, pwd)
+}

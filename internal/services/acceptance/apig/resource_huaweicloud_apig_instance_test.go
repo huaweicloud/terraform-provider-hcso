@@ -1,0 +1,412 @@
+package apig
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+
+	"github.com/chnsz/golangsdk/openstack/apigw/dedicated/v2/instances"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+)
+
+func getInstanceFunc(config *config.Config, state *terraform.ResourceState) (interface{}, error) {
+	client, err := config.ApigV2Client(acceptance.HCSO_REGION_NAME)
+	if err != nil {
+		return nil, fmt.Errorf("error creating APIG v2 client: %s", err)
+	}
+
+	return instances.Get(client, state.Primary.ID).Extract()
+}
+
+func TestAccInstance_basic(t *testing.T) {
+	var (
+		instance instances.Instance
+
+		resourceName = "hcso_apig_instance.test"
+		rName        = acceptance.RandomAccResourceName()
+		updateName   = acceptance.RandomAccResourceName()
+	)
+
+	rc := acceptance.InitResourceCheck(
+		resourceName,
+		&instance,
+		getInstanceFunc,
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+			acceptance.TestAccPreCheckEpsID(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstance_basic_step1(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "edition", "BASIC"),
+					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST),
+					resource.TestCheckResourceAttr(resourceName, "maintain_begin", "14:00:00"),
+					resource.TestCheckResourceAttr(resourceName, "maintain_end", "18:00:00"),
+					resource.TestCheckResourceAttr(resourceName, "description", "created by acc test"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "loadbalancer_provider", "elb"),
+					resource.TestCheckResourceAttr(resourceName, "vpcep_service_name", "apig"),
+					resource.TestCheckResourceAttrSet(resourceName, "vpcep_service_address"),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+				),
+			},
+			{
+				Config: testAccInstance_basic_step2(updateName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", updateName),
+					resource.TestCheckResourceAttr(resourceName, "edition", "BASIC"),
+					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST),
+					resource.TestCheckResourceAttr(resourceName, "maintain_begin", "18:00:00"),
+					resource.TestCheckResourceAttr(resourceName, "maintain_end", "22:00:00"),
+					resource.TestCheckResourceAttr(resourceName, "description", ""),
+					resource.TestCheckResourceAttr(resourceName, "tags.foo", "bar"),
+					resource.TestCheckResourceAttr(resourceName, "vpcep_service_name", "new_custom_apig"),
+					resource.TestCheckResourceAttrSet(resourceName, "vpcep_service_address"),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func testAccInstance_basic_step1(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id                = hcso_vpc.test.id
+  subnet_id             = hcso_vpc_subnet.test.id
+  security_group_id     = hcso_networking_secgroup.test.id
+  availability_zones    = slice(data.hcso_availability_zones.test.names, 0, 1)
+  loadbalancer_provider = "elb"
+
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  maintain_begin        = "14:00:00"
+  description           = "created by acc test"
+
+  tags = {}
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
+
+func testAccInstance_basic_step2(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_networking_secgroup" "new" {
+  name = "%[2]s_new"
+}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id                = hcso_vpc.test.id
+  subnet_id             = hcso_vpc_subnet.test.id
+  security_group_id     = hcso_networking_secgroup.new.id
+  availability_zones    = slice(data.hcso_availability_zones.test.names, 0, 1)
+  loadbalancer_provider = "elb"
+  vpcep_service_name    = "new_custom_apig"
+
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  maintain_begin        = "18:00:00"
+
+  tags = {
+    foo = "bar"
+  }
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
+
+func TestAccInstance_egress(t *testing.T) {
+	var (
+		instance instances.Instance
+
+		resourceName = "hcso_apig_instance.test"
+		rName        = acceptance.RandomAccResourceName()
+	)
+
+	rc := acceptance.InitResourceCheck(
+		resourceName,
+		&instance,
+		getInstanceFunc,
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+			acceptance.TestAccPreCheckEpsID(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstance_baseConfig(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "edition", "BASIC"),
+					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST),
+					resource.TestCheckResourceAttr(resourceName, "maintain_begin", "14:00:00"),
+					resource.TestCheckResourceAttr(resourceName, "description", "created by acc test"),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+					resource.TestCheckResourceAttr(resourceName, "bandwidth_size", "0"),
+				),
+			},
+			{
+				Config: testAccInstance_egress(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+					resource.TestCheckResourceAttr(resourceName, "bandwidth_size", "3"),
+					resource.TestCheckResourceAttrSet(resourceName, "egress_address"),
+				),
+			},
+			{
+				Config: testAccInstance_egressUpdate(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+					resource.TestCheckResourceAttr(resourceName, "bandwidth_size", "5"),
+					resource.TestCheckResourceAttrSet(resourceName, "egress_address"),
+				),
+			},
+			{
+				Config: testAccInstance_baseConfig(rName), // Unbind egress nat
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+					resource.TestCheckResourceAttr(resourceName, "bandwidth_size", "0"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func testAccInstance_baseConfig(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id                = hcso_vpc.test.id
+  subnet_id             = hcso_vpc_subnet.test.id
+  security_group_id     = hcso_networking_secgroup.test.id
+  availability_zones    = slice(data.hcso_availability_zones.test.names, 0, 1)
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  maintain_begin        = "14:00:00"
+  description           = "created by acc test"
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
+
+func TestAccInstance_ingress(t *testing.T) {
+	var (
+		instance instances.Instance
+
+		resourceName = "hcso_apig_instance.test"
+		rName        = acceptance.RandomAccResourceName()
+	)
+
+	rc := acceptance.InitResourceCheck(
+		resourceName,
+		&instance,
+		getInstanceFunc,
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+			acceptance.TestAccPreCheckEpsID(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstance_baseConfig(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "edition", "BASIC"),
+					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST),
+					resource.TestCheckResourceAttr(resourceName, "maintain_begin", "14:00:00"),
+					resource.TestCheckResourceAttr(resourceName, "description", "created by acc test"),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+				),
+			},
+			{
+				Config: testAccInstance_ingress(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+					resource.TestCheckResourceAttrSet(resourceName, "eip_id"),
+					resource.TestCheckResourceAttrSet(resourceName, "ingress_address"),
+				),
+			},
+			{
+				Config: testAccInstance_ingressUpdate(rName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+					resource.TestCheckResourceAttrSet(resourceName, "eip_id"),
+					resource.TestCheckResourceAttrSet(resourceName, "ingress_address"),
+				),
+			},
+			{
+				Config: testAccInstance_baseConfig(rName), // Unbind ingress eip
+				Check: resource.ComposeTestCheckFunc(rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttrSet(resourceName, "vpc_ingress_address"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func testAccInstance_egress(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id             = hcso_vpc.test.id
+  subnet_id          = hcso_vpc_subnet.test.id
+  security_group_id  = hcso_networking_secgroup.test.id
+  availability_zones = slice(data.hcso_availability_zones.test.names, 0, 1)
+
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  bandwidth_size        = 3
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
+
+func testAccInstance_egressUpdate(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id             = hcso_vpc.test.id
+  subnet_id          = hcso_vpc_subnet.test.id
+  security_group_id  = hcso_networking_secgroup.test.id
+  availability_zones = slice(data.hcso_availability_zones.test.names, 0, 1)
+
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  bandwidth_size        = 5
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
+
+func testAccInstance_ingress(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_vpc_eip" "test" {
+  publicip {
+    type = "5_bgp"
+  }
+
+  bandwidth {
+    name        = "%[2]s"
+    size        = 3
+    share_type  = "PER"
+    charge_mode = "traffic"
+  }
+}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id             = hcso_vpc.test.id
+  subnet_id          = hcso_vpc_subnet.test.id
+  security_group_id  = hcso_networking_secgroup.test.id
+  availability_zones = slice(data.hcso_availability_zones.test.names, 0, 1)
+
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  eip_id                = hcso_vpc_eip.test.id
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
+
+func testAccInstance_ingressUpdate(rName string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_vpc_eip" "update" {
+  publicip {
+    type = "5_bgp"
+  }
+  bandwidth {
+    name        = "%[2]s"
+    size        = 4
+    share_type  = "PER"
+    charge_mode = "traffic"
+  }
+}
+
+resource "hcso_apig_instance" "test" {
+  vpc_id             = hcso_vpc.test.id
+  subnet_id          = hcso_vpc_subnet.test.id
+  security_group_id  = hcso_networking_secgroup.test.id
+  availability_zones = slice(data.hcso_availability_zones.test.names, 0, 1)
+
+  edition               = "BASIC"
+  name                  = "%[2]s"
+  enterprise_project_id = "%[3]s"
+  maintain_begin        = "14:00:00"
+  eip_id                = hcso_vpc_eip.update.id
+}
+`, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
+}
