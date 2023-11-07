@@ -1,7 +1,7 @@
 # HUAWEI CLOUD Stack Online Provider
 
-The HUAWEI CLOUD Stack Online provider is used to interact with the many resources supported by HUAWEI CLOUD Stack Online. The provider needs to be
-configured with the proper credentials before it can be used.
+The HUAWEI CLOUD Stack Online provider is used to interact with the many resources supported by HUAWEI CLOUD Stack
+Online. The provider needs to be configured with the proper credentials before it can be used.
 
 Use the navigation to the left to read about the available resources.
 
@@ -53,7 +53,8 @@ resource "hcso_vpc" "example" {
 
 ## Authentication
 
-The HUAWEI CLOUD Stack Online provider offers a flexible means of providing credentials for authentication. The following methods are
+The HUAWEI CLOUD Stack Online provider offers a flexible means of providing credentials for authentication. The
+following methods are
 supported, in this order, and explained below:
 
 * Static credentials
@@ -164,13 +165,16 @@ The following arguments are supported:
 * `region` - (Optional) This is the Huawei Cloud region. It must be provided when using `static credentials`
   authentication, but it can also be sourced from the `HCSO_REGION_NAME` environment variables.
 
-* `access_key` - (Optional) The access key of the HUAWEI CLOUD Stack Online to use. If omitted, the `HCSO_ACCESS_KEY` environment
+* `access_key` - (Optional) The access key of the HUAWEI CLOUD Stack Online to use. If omitted, the `HCSO_ACCESS_KEY`
+  environment
   variable is used.
 
-* `secret_key` - (Optional) The secret key of the HUAWEI CLOUD Stack Online to use. If omitted, the `HCSO_SECRET_KEY` environment
+* `secret_key` - (Optional) The secret key of the HUAWEI CLOUD Stack Online to use. If omitted, the `HCSO_SECRET_KEY`
+  environment
   variable is used.
 
-* `shared_config_file` - (Optional) The path to the shared config file. If omitted, the `HCSO_SHARED_CONFIG_FILE` environment
+* `shared_config_file` - (Optional) The path to the shared config file. If omitted, the `HCSO_SHARED_CONFIG_FILE`
+  environment
   variable is used.
 
 * `profile` - (Optional) The profile name as set in the shared config file. If omitted, the `HCSO_PROFILE` environment
@@ -182,7 +186,8 @@ The following arguments are supported:
 * `project_name` - (Optional) The Name of the project to login with. If omitted, the `HCSO_PROJECT_NAME` environment
   variable or `region` is used.
 
-* `domain_name` - (Optional) The Account name of IAM to scope to. If omitted, the `HCSO_DOMAIN_NAME` environment variable is used.
+* `domain_name` - (Optional) The Account name of IAM to scope to. If omitted, the `HCSO_DOMAIN_NAME` environment
+  variable is used.
 
 * `security_token` - (Optional) The security token to authenticate with a temporary security credential. If omitted,
   the `HCSO_SECURITY_TOKEN` environment variable is used.
@@ -214,9 +219,9 @@ The following arguments are supported:
 ```hcl
 provider "hcso" {
   ...
-  endpoints = {
-    ecs = "https://ecs-customizing-endpoint.com"
-  }
+endpoints = {
+  ecs = "https://ecs-customizing-endpoint.com"
+}
 }
 ```
 
@@ -238,4 +243,5 @@ In order to run the Acceptance Tests for development, the following environment 
 
 * `HCSO_SECRET_KEY` - The secret key of the HUAWEI CLOUD Stack Online to use.
 
-You should be able to use any HUAWEI CLOUD Stack Online environment to develop on as long as the above environment variables are set.
+You should be able to use any HUAWEI CLOUD Stack Online environment to develop on as long as the above environment
+variables are set.
