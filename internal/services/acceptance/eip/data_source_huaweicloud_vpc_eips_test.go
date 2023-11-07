@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccVpcEipsDataSource_basic(t *testing.T) {

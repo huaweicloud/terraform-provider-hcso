@@ -9,9 +9,11 @@ import (
 
 	"github.com/chnsz/golangsdk"
 	"github.com/chnsz/golangsdk/openstack/dayu/v1/instances"
+
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 )
 
 func getInstanceResourceFunc(config *config.Config, state *terraform.ResourceState) (interface{}, error) {

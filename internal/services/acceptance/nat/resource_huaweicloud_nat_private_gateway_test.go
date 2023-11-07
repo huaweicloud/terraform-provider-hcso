@@ -9,10 +9,11 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/nat/v3/gateways"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 )
 
 func getPrivateGatewayResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

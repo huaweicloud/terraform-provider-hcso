@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/ecs/v1/cloudservers"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccComputeInstance_basic(t *testing.T) {

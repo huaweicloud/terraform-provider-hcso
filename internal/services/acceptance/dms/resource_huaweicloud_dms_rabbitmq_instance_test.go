@@ -10,9 +10,10 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/dms/v2/rabbitmq/instances"
 
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 )
 
 func getDmsRabbitMqInstanceFunc(c *config.Config, state *terraform.ResourceState) (interface{}, error) {

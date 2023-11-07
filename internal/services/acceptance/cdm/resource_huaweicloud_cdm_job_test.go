@@ -9,9 +9,10 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/cdm/v1/job"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cdm"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getCdmJobResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

@@ -5,7 +5,7 @@ name: pre-release
 # Controls when the workflow will run
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - 'CHANGELOG.md'
   # Allows you to run this workflow manually from the Actions tab
@@ -43,12 +43,12 @@ jobs:
 
       - name: Get the provider release version
         run: |
-          version=$(head -n 4 terraform-provider-huaweicloud/CHANGELOG.md  | grep "^## " | awk '{printf "v%s", $2}')
+          version=$(head -n 4 terraform-provider-hcso/CHANGELOG.md  | grep "^## " | awk '{printf "v%s", $2}')
           echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: Build Terraform Provider
         run: |
-          cd terraform-provider-huaweicloud
+          cd terraform-provider-hcso
           make build FLAGS='-mod=readonly'
           cd ..
 
@@ -71,10 +71,10 @@ jobs:
       
       - name: parse APIs that golangsdk/go-SDK resources depend-on
         run: |
-          cp terraform-api-scan/*.go terraform-provider-huaweicloud/
+          cp terraform-api-scan/*.go terraform-provider-hcso/
           subPackPath="/huaweicloud"
           providerSchemaPath="../terraform-api-scan/schema.json"
-          cd terraform-provider-huaweicloud
+          cd terraform-provider-hcso
           rm -rf docs/api
           mkdir docs/api
           go run *.go -basePath=./ -outputDir=docs/api/ -providerSchemaPath=${providerSchemaPath}
@@ -85,7 +85,7 @@ jobs:
       - name: parse APIs that auto-generated resources depend-on
         run: |
           cd terraform-api-scan/scan-autogen-code
-          go run main.go -inputDir=../../terraform-provider-generator/src/main/resources -outputDir=../../terraform-provider-huaweicloud/docs/api -providerSchemaPath=../schema.json
+          go run main.go -inputDir=../../terraform-provider-generator/src/main/resources -outputDir=../../terraform-provider-hcso/docs/api -providerSchemaPath=../schema.json
           cd ../../
 
       - name: commit APIs that resources depend-on
@@ -115,7 +115,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: terraform-provider-hcso
-          ref: master
+          ref: main
 
       - uses: actions/checkout@v3
         with:
@@ -126,15 +126,15 @@ jobs:
       - name: import the latest codes of provider and build
         run: |
           cd huaweicloud-provider-json
-          go get github.com/huaweicloud/terraform-provider-huaweicloud@master
+          go get github.com/huaweicloud/terraform-provider-hcso@main
           go build -o generate-schemas
-          cp ./generate-schemas ../terraform-provider-huaweicloud
+          cp ./generate-schemas ../terraform-provider-hcso
           cd ..
 
       - name: generate-schema
         shell: bash {0}
         run: |
-          cd terraform-provider-huaweicloud
+          cd terraform-provider-hcso
           target="./docs/json"
           rm -rf $target
           echo -e "\ntry to update the product config file..."
@@ -151,7 +151,7 @@ jobs:
 
       - name: Get the provider release version
         run: |
-          version=$(head -n 4 terraform-provider-huaweicloud/CHANGELOG.md  | grep "^## " | awk '{printf "v%s", $2}')
+          version=$(head -n 4 terraform-provider-hcso/CHANGELOG.md  | grep "^## " | awk '{printf "v%s", $2}')
           echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: auto-commit

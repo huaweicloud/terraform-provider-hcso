@@ -10,10 +10,11 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/ims/v2/cloudimages"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 )
 
 func TestAccImsImage_basic(t *testing.T) {

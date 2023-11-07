@@ -10,8 +10,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/sdrs/v1/protectedinstances"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getReplicationAttachResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

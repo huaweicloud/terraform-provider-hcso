@@ -10,8 +10,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/er/v3/routes"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getStaticRouteFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

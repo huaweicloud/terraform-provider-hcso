@@ -5,12 +5,14 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/chnsz/golangsdk/openstack/dli/v1/flinkjob"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+
+	"github.com/chnsz/golangsdk/openstack/dli/v1/flinkjob"
+
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getDliFlinkSqlJobResourceFunc(config *config.Config, state *terraform.ResourceState) (interface{}, error) {

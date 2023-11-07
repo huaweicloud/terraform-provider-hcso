@@ -10,8 +10,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/elb/v3/monitors"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getELBMonitorResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

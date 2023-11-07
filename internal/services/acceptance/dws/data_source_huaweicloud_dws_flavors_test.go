@@ -113,6 +113,7 @@ data "hcso_dws_flavors" "test" {
   memory = 64
 }
 `
+
 const testAccDwsFlavorsDataSource_all = `
 data "hcso_availability_zones" "test" {}
 

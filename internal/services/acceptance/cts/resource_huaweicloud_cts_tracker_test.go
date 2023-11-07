@@ -9,8 +9,9 @@ import (
 
 	cts "github.com/huaweicloud/huaweicloud-sdk-go-v3/services/cts/v3/model"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccCTSTracker_basic(t *testing.T) {

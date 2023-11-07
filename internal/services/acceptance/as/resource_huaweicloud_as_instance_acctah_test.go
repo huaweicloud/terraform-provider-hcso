@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/autoscaling/v1/instances"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getASInstanceAttachResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

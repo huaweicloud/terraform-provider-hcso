@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/vpcep/v1/endpoints"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccVPCEndpoint_Basic(t *testing.T) {

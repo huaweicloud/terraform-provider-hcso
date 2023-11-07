@@ -3,9 +3,9 @@ package dds
 import (
 	"testing"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccDDSFlavorV3DataSource_basic(t *testing.T) {

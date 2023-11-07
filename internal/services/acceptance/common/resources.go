@@ -1,6 +1,8 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // TestSecGroup can be referred as `hcso_networking_secgroup.test`
 func TestSecGroup(name string) string {

@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/networking/v1/flowlogs"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getFlowLogResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {

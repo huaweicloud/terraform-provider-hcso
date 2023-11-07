@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/modelarts/v1/notebook"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getNotebookResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

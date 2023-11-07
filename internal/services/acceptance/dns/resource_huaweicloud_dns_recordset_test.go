@@ -13,9 +13,10 @@ import (
 	"github.com/chnsz/golangsdk"
 	"github.com/chnsz/golangsdk/openstack/dns/v2/zones"
 
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/utils"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 )
 
 func getDNSRecordsetResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

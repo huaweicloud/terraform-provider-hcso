@@ -10,8 +10,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/compute/v2/extensions/attachinterfaces"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccComputeInterfaceAttach_Basic(t *testing.T) {

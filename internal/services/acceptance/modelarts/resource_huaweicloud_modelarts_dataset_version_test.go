@@ -10,9 +10,10 @@ import (
 	"github.com/chnsz/golangsdk/openstack/modelarts/v2/dataset"
 	"github.com/chnsz/golangsdk/openstack/modelarts/v2/version"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/modelarts"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getDatasetVersionResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

@@ -9,10 +9,11 @@ import (
 
 	instances "github.com/chnsz/golangsdk/openstack/waf_hw/v1/premium_instances"
 
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 )
 
 func getWafDedicatedInstanceFunc(c *config.Config, state *terraform.ResourceState) (interface{}, error) {

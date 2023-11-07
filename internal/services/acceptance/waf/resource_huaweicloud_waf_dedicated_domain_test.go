@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	domains "github.com/chnsz/golangsdk/openstack/waf_hw/v1/premium_domains"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	domains "github.com/chnsz/golangsdk/openstack/waf_hw/v1/premium_domains"
+
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccWafDedicateDomainV1_basic(t *testing.T) {

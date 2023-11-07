@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/networking/v1/security/rules"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getNetworkSecGroupRuleResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

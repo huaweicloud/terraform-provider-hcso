@@ -10,8 +10,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/dcs/v2/instances"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getDcsResourceFunc(c *config.Config, state *terraform.ResourceState) (interface{}, error) {

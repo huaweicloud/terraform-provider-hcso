@@ -4,9 +4,9 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccRdsFlavorDataSource_basic(t *testing.T) {

@@ -8,8 +8,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
 	"github.com/chnsz/golangsdk/openstack/networking/v1/eips"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getEipResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {

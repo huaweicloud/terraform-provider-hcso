@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/identity/v3.0/security"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccProtectionPolicy_basic(t *testing.T) {

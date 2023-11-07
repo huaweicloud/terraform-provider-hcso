@@ -3,7 +3,7 @@ package pathorcontents
 import (
 	"os"
 
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 // Read if the argument is a path, Read loads it and returns the contents,

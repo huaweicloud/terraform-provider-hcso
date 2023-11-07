@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/eg/v1/source/custom"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getCustomEventSourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

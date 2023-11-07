@@ -9,8 +9,9 @@ import (
 
 	rules "github.com/chnsz/golangsdk/openstack/waf_hw/v1/whiteblackip_rules"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccWafRuleBlackList_basic(t *testing.T) {

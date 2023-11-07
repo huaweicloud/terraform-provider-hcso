@@ -9,10 +9,11 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/cbr/v3/vaults"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 )
 
 func getVaultResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {

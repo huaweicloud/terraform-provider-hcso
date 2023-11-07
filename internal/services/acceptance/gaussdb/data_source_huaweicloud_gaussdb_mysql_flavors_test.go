@@ -3,11 +3,11 @@ package gaussdb
 import (
 	"testing"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
 )
 
 func TestAccHuaweiCloudGaussdbMysqlFlavorsDataSource_basic(t *testing.T) {

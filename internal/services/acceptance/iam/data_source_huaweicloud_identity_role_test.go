@@ -45,6 +45,7 @@ data "hcso_identity_role" "role_1" {
   name = "system_all_64"
 }
 `
+
 const testAccIdentityRoleDataSource_by_displayname = `
 data "hcso_identity_role" "role_1" {
   display_name = "KMS Administrator"

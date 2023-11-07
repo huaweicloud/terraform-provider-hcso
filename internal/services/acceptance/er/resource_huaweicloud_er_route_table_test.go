@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/chnsz/golangsdk/openstack/er/v3/routetables"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/chnsz/golangsdk/openstack/er/v3/routetables"
+
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getRouteTableResourceFunc(config *config.Config, state *terraform.ResourceState) (interface{}, error) {

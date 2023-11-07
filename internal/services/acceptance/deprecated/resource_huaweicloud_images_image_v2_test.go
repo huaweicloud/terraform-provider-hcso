@@ -3,13 +3,15 @@ package deprecated
 import (
 	"testing"
 
-	"github.com/chnsz/golangsdk/openstack/imageservice/v2/images"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+
+	"github.com/chnsz/golangsdk/openstack/imageservice/v2/images"
+
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
 )
 
 func TestAccImagesImageV2_basic(t *testing.T) {

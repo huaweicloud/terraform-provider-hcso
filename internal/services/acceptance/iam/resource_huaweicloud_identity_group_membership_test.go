@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/identity/v3/users"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccIdentityGroupMembership_basic(t *testing.T) {

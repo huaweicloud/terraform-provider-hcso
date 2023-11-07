@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/identity/federatedauth/providers"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getProviderResourceFunc(c *config.Config, state *terraform.ResourceState) (interface{}, error) {

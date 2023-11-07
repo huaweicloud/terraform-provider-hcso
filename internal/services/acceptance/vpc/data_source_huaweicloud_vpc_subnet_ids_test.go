@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccVpcSubnetIdsDataSource_basic(t *testing.T) {
@@ -29,6 +29,7 @@ func TestAccVpcSubnetIdsDataSource_basic(t *testing.T) {
 		},
 	})
 }
+
 func testAccSubnetIdsDataSource_basic(rName string) string {
 	return fmt.Sprintf(`
 data "hcso_availability_zones" "test" {}

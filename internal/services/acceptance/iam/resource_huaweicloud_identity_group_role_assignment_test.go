@@ -11,9 +11,10 @@ import (
 	"github.com/chnsz/golangsdk/openstack/identity/v3.0/eps_permissions"
 	"github.com/chnsz/golangsdk/openstack/identity/v3/roles"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/iam"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getIdentityGroupRoleAssignmentResourceFunc(c *config.Config, state *terraform.ResourceState) (interface{}, error) {

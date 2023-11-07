@@ -74,7 +74,8 @@ linters-settings:
       - default
       # Custom section: groups all imports with the specified Prefix.
       - prefix(github.com/chnsz/golangsdk)
-      - prefix(github.com/huaweicloud/internal-sdk-go-v3)
+      - prefix(github.com/huaweicloud/huaweicloud-sdk-go-v3)
+      - prefix(github.com/huaweicloud/terraform-provider-huaweicloud)
       - prefix(github.com/huaweicloud/terraform-provider-hcso)
       - blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
       - dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.

@@ -9,9 +9,10 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/rms/v1/policyassignments"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rms"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getPolicyAssignmentResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

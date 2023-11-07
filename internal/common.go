@@ -1,12 +1,15 @@
 package internal
 
 import (
-	"github.com/chnsz/golangsdk"
-	"github.com/chnsz/golangsdk/openstack/bss/v2/orders"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
+
+	"github.com/chnsz/golangsdk"
+	"github.com/chnsz/golangsdk/openstack/bss/v2/orders"
+
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/utils/fmtp"
 )
 
 // GetRegion returns the region that was specified in the resource. If a

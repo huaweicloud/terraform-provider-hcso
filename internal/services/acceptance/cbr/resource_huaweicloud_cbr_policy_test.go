@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/cbr/v3/policies"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getPolicyResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {

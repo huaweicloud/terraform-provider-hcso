@@ -9,9 +9,10 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/apigw/dedicated/v2/responses"
 
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 )
 
 func getResponseFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

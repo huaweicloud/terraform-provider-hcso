@@ -10,8 +10,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/elb/v3/ipgroups"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccElbV3IpGroup_basic(t *testing.T) {

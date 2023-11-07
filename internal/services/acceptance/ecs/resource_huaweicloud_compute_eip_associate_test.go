@@ -12,8 +12,9 @@ import (
 	bandwidthsv1 "github.com/chnsz/golangsdk/openstack/networking/v1/bandwidths"
 	"github.com/chnsz/golangsdk/openstack/networking/v1/eips"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccComputeEIPAssociate_basic(t *testing.T) {

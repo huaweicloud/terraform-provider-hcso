@@ -9,9 +9,10 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/elb/v2/listeners"
 
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 )
 
 func getL7ListenerResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {

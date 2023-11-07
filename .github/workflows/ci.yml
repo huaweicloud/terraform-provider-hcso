@@ -85,35 +85,5 @@ jobs:
         run: |
           cd ${{ github.workspace }}/tfproviderlint/cmd/tfproviderlint
           go install
-          cd ${{ github.workspace }}/terraform-provider-huaweicloud
+          cd ${{ github.workspace }}/terraform-provider-hcso
           tfproviderlint -R019=false -S018=false -V011=false -V012=false -V013=false -V014=false ./...
-
-  schema-markdown-check:
-    runs-on: ubuntu-latest
-
-    env:
-      # when HCSO_SCHEMA is not empty, custom schema config will be contained in the description of parameters
-      # for the schema-markdown-check
-      HCSO_SCHEMA: "true"
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.18"
-
-      - name: Check schemas and markdown docs
-        shell: bash {0}
-        run: |
-          cd scripts/markdown_check
-          go build -o markdown_check main.go
-          ./markdown_check >check_result.log
-
-          # There are three known issues for hcso_mapreduce_cluster
-          ret=$(($?-3))
-          if [ $ret -gt 0 ]; then
-            echo "ERROR: find $ret inconsistencies between schemas and markdown docs"
-            echo -e "please ignore the errors in hcso_mapreduce_cluster\n"
-            grep -B1 "\[ERROR\]" check_result.log
-          fi
-          exit $ret

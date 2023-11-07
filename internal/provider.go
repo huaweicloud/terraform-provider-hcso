@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"fmt"
-
 	"log"
 	"os"
 	"strings"
@@ -12,9 +11,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
-
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
 )
 
 const (

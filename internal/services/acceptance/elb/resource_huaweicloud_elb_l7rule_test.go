@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/elb/v3/l7policies"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getELBl7RuleResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {

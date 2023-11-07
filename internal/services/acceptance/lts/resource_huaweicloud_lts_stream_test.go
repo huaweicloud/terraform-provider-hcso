@@ -9,8 +9,9 @@ import (
 
 	"github.com/chnsz/golangsdk/openstack/lts/huawei/logstreams"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func getLtsStreamResourceFunc(cfg *config.Config, state *terraform.ResourceState) (interface{}, error) {
