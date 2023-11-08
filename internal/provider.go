@@ -14,6 +14,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
 	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
 )
@@ -289,9 +290,13 @@ func Provider() *schema.Provider {
 			"hcso_availability_zones": huaweicloud.DataSourceAvailabilityZones(),
 
 			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
+
+			"hcso_vpc": vpc.DataSourceVpcV1(),
 		},
 
-		ResourcesMap: map[string]*schema.Resource{},
+		ResourcesMap: map[string]*schema.Resource{
+			"hcso_vpc": vpc.ResourceVirtualPrivateCloudV1(),
+		},
 	}
 
 	provider.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
