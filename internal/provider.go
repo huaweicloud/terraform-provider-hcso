@@ -11,7 +11,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 
 	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
 )
@@ -283,7 +285,11 @@ func Provider() *schema.Provider {
 			},
 		},
 
-		DataSourcesMap: map[string]*schema.Resource{},
+		DataSourcesMap: map[string]*schema.Resource{
+			"hcso_availability_zones": huaweicloud.DataSourceAvailabilityZones(),
+
+			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
+		},
 
 		ResourcesMap: map[string]*schema.Resource{},
 	}
