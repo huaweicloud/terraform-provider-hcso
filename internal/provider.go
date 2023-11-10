@@ -14,6 +14,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
 	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
@@ -292,10 +293,14 @@ func Provider() *schema.Provider {
 			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
 
 			"hcso_vpc": vpc.DataSourceVpcV1(),
+
+			"hso_evs_volumes": evs.DataSourceEvsVolumesV2(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"hcso_vpc": vpc.ResourceVirtualPrivateCloudV1(),
+
+			"hcso_evs_volume": evs.ResourceEvsVolume(),
 		},
 	}
 

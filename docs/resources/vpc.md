@@ -4,7 +4,7 @@ subcategory: "Virtual Private Cloud (VPC)"
 
 # hcso_vpc
 
-Manages a VPC resource within HCSO.
+Manages a VPC resource within Huawei Cloud Stack Online.
 
 ## Example Usage
 
