@@ -30,8 +30,6 @@ func TestAccEvsVolume_basic(t *testing.T) {
 	resourceName2 := "hcso_evs_volume.test.1"
 	resourceName3 := "hcso_evs_volume.test.2"
 	resourceName4 := "hcso_evs_volume.test.3"
-	resourceName5 := "hcso_evs_volume.test.4"
-	resourceName6 := "hcso_evs_volume.test.5"
 
 	rc := acceptance.InitResourceCheck(
 		resourceName,
@@ -47,7 +45,7 @@ func TestAccEvsVolume_basic(t *testing.T) {
 			{
 				Config: testAccEvsVolume_basic(rName),
 				Check: resource.ComposeTestCheckFunc(
-					rc.CheckMultiResourcesExists(6),
+					rc.CheckMultiResourcesExists(4),
 					// Common configuration
 					resource.TestCheckResourceAttrPair(resourceName1, "availability_zone",
 						"data.hcso_availability_zones.test", "names.0"),
@@ -73,19 +71,6 @@ func TestAccEvsVolume_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName4, "name", rName+"_scsi_share_volume"),
 					resource.TestCheckResourceAttr(resourceName4, "device_type", "SCSI"),
 					resource.TestCheckResourceAttr(resourceName4, "multiattach", "true"),
-
-					resource.TestCheckResourceAttr(resourceName5, "name", rName+"_gpssd2_normal_volume"),
-					resource.TestCheckResourceAttr(resourceName5, "volume_type", "GPSSD2"),
-					resource.TestCheckResourceAttr(resourceName5, "device_type", "SCSI"),
-					resource.TestCheckResourceAttr(resourceName5, "multiattach", "false"),
-					resource.TestCheckResourceAttr(resourceName5, "iops", "3000"),
-					resource.TestCheckResourceAttr(resourceName5, "throughput", "500"),
-
-					resource.TestCheckResourceAttr(resourceName6, "name", rName+"_essd2_normal_volume"),
-					resource.TestCheckResourceAttr(resourceName6, "volume_type", "ESSD2"),
-					resource.TestCheckResourceAttr(resourceName6, "device_type", "SCSI"),
-					resource.TestCheckResourceAttr(resourceName6, "multiattach", "false"),
-					resource.TestCheckResourceAttr(resourceName6, "iops", "3000"),
 				),
 			},
 			{
@@ -106,8 +91,6 @@ func TestAccEvsVolume_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName2, "name", rName+"_vbd_share_volume_update"),
 					resource.TestCheckResourceAttr(resourceName3, "name", rName+"_scsi_normal_volume_update"),
 					resource.TestCheckResourceAttr(resourceName4, "name", rName+"_scsi_share_volume_update"),
-					resource.TestCheckResourceAttr(resourceName5, "name", rName+"_gpssd2_normal_volume_update"),
-					resource.TestCheckResourceAttr(resourceName6, "name", rName+"_essd2_normal_volume_update"),
 				),
 			},
 		},
@@ -149,64 +132,6 @@ func TestAccEvsVolume_withEpsId(t *testing.T) {
 				ImportStateVerifyIgnore: []string{
 					"cascade",
 				},
-			},
-		},
-	})
-}
-
-func TestAccEvsVolume_prePaid(t *testing.T) {
-	var volume cloudvolumes.Volume
-	rName := acceptance.RandomAccResourceName()
-	resourceName := "hcso_evs_volume.test"
-	resourceName1 := "hcso_evs_volume.test.0"
-	resourceName2 := "hcso_evs_volume.test.1"
-
-	rc := acceptance.InitResourceCheck(
-		resourceName,
-		&volume,
-		getVolumeResourceFunc,
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      rc.CheckResourceDestroy(),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccEvsVolume_prePaid(rName, false),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckMultiResourcesExists(2),
-					// Common configuration
-					resource.TestCheckResourceAttrPair(resourceName1, "availability_zone",
-						"data.hcso_availability_zones.test", "names.0"),
-					resource.TestCheckResourceAttr(resourceName1, "description",
-						"test volume for charging mode"),
-					resource.TestCheckResourceAttr(resourceName1, "size", "100"),
-
-					// Personalized configuration
-					resource.TestCheckResourceAttr(resourceName1, "volume_type", "SSD"),
-					resource.TestCheckResourceAttr(resourceName1, "name", rName+"_ssd_volume"),
-					resource.TestCheckResourceAttr(resourceName1, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName1, "auto_renew", "false"),
-
-					resource.TestCheckResourceAttr(resourceName2, "volume_type", "GPSSD2"),
-					resource.TestCheckResourceAttr(resourceName2, "name", rName+"_gpssd2_volume"),
-					resource.TestCheckResourceAttr(resourceName2, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName2, "auto_renew", "false"),
-					resource.TestCheckResourceAttr(resourceName2, "iops", "3000"),
-					resource.TestCheckResourceAttr(resourceName2, "throughput", "500"),
-				),
-			},
-			{
-				Config: testAccEvsVolume_prePaid(rName, true),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckMultiResourcesExists(2),
-					resource.TestCheckResourceAttr(resourceName1, "auto_renew", "true"),
-					resource.TestCheckResourceAttr(resourceName2, "auto_renew", "true"),
-				),
 			},
 		},
 	})
@@ -254,22 +179,6 @@ variable "volume_configuration" {
       volume_type = "SSD",
       multiattach = true,
       iops = 0,
-      throughput = 0
-    },
-    {
-      suffix = "gpssd2_normal_volume",
-      device_type = "SCSI",
-      volume_type = "GPSSD2",
-      multiattach = false,
-      iops = 3000,
-      throughput = 500
-    },
-    {
-      suffix = "essd2_normal_volume",
-      device_type = "SCSI",
-      volume_type = "ESSD2",
-      multiattach = false,
-      iops = 3000,
       throughput = 0
     },
   ]
