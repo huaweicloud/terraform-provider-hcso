@@ -294,13 +294,18 @@ func Provider() *schema.Provider {
 
 			"hcso_vpc": vpc.DataSourceVpcV1(),
 
-			"hso_evs_volumes": evs.DataSourceEvsVolumesV2(),
+			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
+
+			"hcso_vpc_subnet_ids": vpc.DataSourceVpcSubnetIdsV1(),
+			"hcso_vpc_subnets":    vpc.DataSourceVpcSubnets(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"hcso_vpc": vpc.ResourceVirtualPrivateCloudV1(),
 
 			"hcso_evs_volume": evs.ResourceEvsVolume(),
+
+			"hcso_vpc_subnet": vpc.ResourceVpcSubnetV1(),
 		},
 	}
 
