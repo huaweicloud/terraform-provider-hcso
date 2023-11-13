@@ -299,9 +299,13 @@ func Provider() *schema.Provider {
 
 			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
 
-			"hcso_vpc":            vpc.DataSourceVpcV1(),
-			"hcso_vpc_subnets":    vpc.DataSourceVpcSubnets(),
-			"hcso_vpc_subnet_ids": vpc.DataSourceVpcSubnetIdsV1(),
+			"hcso_vpc":                    vpc.DataSourceVpcV1(),
+			"hcso_vpcs":                   vpc.DataSourceVpcs(),
+			"hcso_vpc_subnet_ids":         vpc.DataSourceVpcSubnetIdsV1(),
+			"hcso_vpc_subnets":            vpc.DataSourceVpcSubnets(),
+			"hcso_networking_port":        vpc.DataSourceNetworkingPortV2(),
+			"hcso_vpc_peering_connection": vpc.DataSourceVpcPeeringConnectionV2(),
+			"hcso_networking_secgroups":   vpc.DataSourceNetworkingSecGroups(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -315,8 +319,14 @@ func Provider() *schema.Provider {
 			"hcso_images_image_share":          ims.ResourceImsImageShare(),
 			"hcso_images_image_share_accepter": ims.ResourceImsImageShareAccepter(),
 
-			"hcso_vpc":        vpc.ResourceVirtualPrivateCloudV1(),
-			"hcso_vpc_subnet": vpc.ResourceVpcSubnetV1(),
+			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
+			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
+			"hcso_vpc_subnet":                      vpc.ResourceVpcSubnetV1(),
+			"hcso_vpc_peering_connection":          vpc.ResourceVpcPeeringConnectionV2(),
+			"hcso_vpc_peering_connection_accepter": vpc.ResourceVpcPeeringConnectionAccepterV2(),
+			"hcso_networking_secgroup":             vpc.ResourceNetworkingSecGroup(),
+			"hcso_networking_secgroup_rule":        vpc.ResourceNetworkingSecGroupRule(),
+			"hcso_networking_vip":                  vpc.ResourceNetworkingVip(),
 		},
 	}
 
