@@ -1,6 +1,6 @@
 # hcso_availability_zones
 
-Use this data source to get a list of availability zones from hcso
+Use this data source to get a list of availability zones from Huawei Cloud Stack Online.
 
 ## Example Usage
 
