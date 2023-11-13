@@ -13,8 +13,10 @@ import (
 
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
 	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
@@ -292,19 +294,28 @@ func Provider() *schema.Provider {
 
 			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
 
-			"hcso_vpc": vpc.DataSourceVpcV1(),
+			"hcso_images_image":  ims.DataSourceImagesImageV2(),
+			"hcso_images_images": ims.DataSourceImagesImages(),
 
 			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
 
-			"hcso_vpc_subnet_ids": vpc.DataSourceVpcSubnetIdsV1(),
+			"hcso_vpc":            vpc.DataSourceVpcV1(),
 			"hcso_vpc_subnets":    vpc.DataSourceVpcSubnets(),
+			"hcso_vpc_subnet_ids": vpc.DataSourceVpcSubnetIdsV1(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"hcso_vpc": vpc.ResourceVirtualPrivateCloudV1(),
+			// hcso_images_image depends on
+			"hcso_cbr_vault": cbr.ResourceVault(),
 
 			"hcso_evs_volume": evs.ResourceEvsVolume(),
 
+			"hcso_images_image":                ims.ResourceImsImage(),
+			"hcso_images_image_copy":           ims.ResourceImsImageCopy(),
+			"hcso_images_image_share":          ims.ResourceImsImageShare(),
+			"hcso_images_image_share_accepter": ims.ResourceImsImageShareAccepter(),
+
+			"hcso_vpc":        vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_subnet": vpc.ResourceVpcSubnetV1(),
 		},
 	}
@@ -394,7 +405,7 @@ func configureProvider(_ context.Context, d *schema.ResourceData, terraformVersi
 	var tenantName, tenantID, delegatedProject, identityEndpoint string
 	region := d.Get("region").(string)
 	isRegional := d.Get("regional").(bool)
-	cloud := getCloudDomain(d.Get("cloud").(string), region)
+	cloud := getCloudDomain(d.Get("cloud").(string))
 
 	// project_name is prior to tenant_name
 	// if neither of them was set, use region as the default project
@@ -533,7 +544,7 @@ func flattenProviderEndpoints(d *schema.ResourceData) (map[string]string, error)
 	return epMap, nil
 }
 
-func getCloudDomain(cloud, region string) string {
+func getCloudDomain(cloud string) string {
 	// first, use the specified value
 	if cloud != "" {
 		return cloud
