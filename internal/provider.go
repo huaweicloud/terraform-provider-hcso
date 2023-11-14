@@ -14,9 +14,12 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
 	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
@@ -306,6 +309,11 @@ func Provider() *schema.Provider {
 			"hcso_networking_port":        vpc.DataSourceNetworkingPortV2(),
 			"hcso_vpc_peering_connection": vpc.DataSourceVpcPeeringConnectionV2(),
 			"hcso_networking_secgroups":   vpc.DataSourceNetworkingSecGroups(),
+
+			"hcso_dns_zones": dns.DataSourceZones(),
+
+			"hcso_lb_listeners":    lb.DataSourceListeners(),
+			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -327,6 +335,19 @@ func Provider() *schema.Provider {
 			"hcso_networking_secgroup":             vpc.ResourceNetworkingSecGroup(),
 			"hcso_networking_secgroup_rule":        vpc.ResourceNetworkingSecGroupRule(),
 			"hcso_networking_vip":                  vpc.ResourceNetworkingVip(),
+
+			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
+			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
+			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+
+			"hcso_lb_l7policy":     lb.ResourceL7PolicyV2(),
+			"hcso_lb_l7rule":       lb.ResourceL7RuleV2(),
+			"hcso_lb_loadbalancer": lb.ResourceLoadBalancer(),
+			"hcso_lb_listener":     lb.ResourceListener(),
+			"hcso_lb_member":       lb.ResourceMemberV2(),
+			"hcso_lb_monitor":      lb.ResourceMonitorV2(),
+			"hcso_lb_pool":         lb.ResourcePoolV2(),
+			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
 		},
 	}
 
