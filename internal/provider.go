@@ -298,20 +298,10 @@ func Provider() *schema.Provider {
 
 			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
 
-			"hcso_images_image":  ims.DataSourceImagesImageV2(),
-			"hcso_images_images": ims.DataSourceImagesImages(),
+			"hcso_vpc": vpc.DataSourceVpcV1(),
 
 			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
-
-			"hcso_vpc":                    vpc.DataSourceVpcV1(),
-			"hcso_vpcs":                   vpc.DataSourceVpcs(),
-			"hcso_vpc_subnet_ids":         vpc.DataSourceVpcSubnetIdsV1(),
-			"hcso_vpc_subnets":            vpc.DataSourceVpcSubnets(),
-			"hcso_networking_port":        vpc.DataSourceNetworkingPortV2(),
-			"hcso_vpc_peering_connection": vpc.DataSourceVpcPeeringConnectionV2(),
-			"hcso_networking_secgroups":   vpc.DataSourceNetworkingSecGroups(),
-
-			"hcso_dns_zones": dns.DataSourceZones(),
+			"hcso_dns_zones":   dns.DataSourceZones(),
 
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
