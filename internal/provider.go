@@ -14,6 +14,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
@@ -314,11 +315,20 @@ func Provider() *schema.Provider {
 
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
+
+			"hcso__cce_addon_template": cce.DataSourceAddonTemplate(),
+			"hcso__cce_cluster":        cce.DataSourceCCEClusterV3(),
+			"hcso__cce_clusters":       cce.DataSourceCCEClusters(),
+			"hcso__cce_node":           cce.DataSourceNode(),
+			"hcso__cce_node_pool":      cce.DataSourceCCENodePoolV3(),
+			"hcso__cce_nodes":          cce.DataSourceNodes(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			// hcso_images_image depends on
 			"hcso_cbr_vault": cbr.ResourceVault(),
+
+			"hcso_compute_keypair": huaweicloud.ResourceComputeKeypairV2(),
 
 			"hcso_evs_volume": evs.ResourceEvsVolume(),
 
@@ -348,6 +358,12 @@ func Provider() *schema.Provider {
 			"hcso_lb_monitor":      lb.ResourceMonitorV2(),
 			"hcso_lb_pool":         lb.ResourcePoolV2(),
 			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
+
+			"hcso__cce_cluster":     cce.ResourceCluster(),
+			"hcso__cce_node":        cce.ResourceNode(),
+			"hcso__cce_node_attach": cce.ResourceNodeAttach(),
+			"hcso__cce_addon":       cce.ResourceAddon(),
+			"hcso__cce_node_pool":   cce.ResourceNodePool(),
 		},
 	}
 
