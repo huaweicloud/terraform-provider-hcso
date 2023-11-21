@@ -17,6 +17,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/eip"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
@@ -298,25 +299,44 @@ func Provider() *schema.Provider {
 
 			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
 
-			"hcso_vpc": vpc.DataSourceVpcV1(),
-
-			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
-			"hcso_dns_zones":   dns.DataSourceZones(),
-
-			"hcso_lb_listeners":    lb.DataSourceListeners(),
-			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
-
 			"hcso_cce_addon_template": cce.DataSourceAddonTemplate(),
 			"hcso_cce_cluster":        cce.DataSourceCCEClusterV3(),
 			"hcso_cce_clusters":       cce.DataSourceCCEClusters(),
 			"hcso_cce_node":           cce.DataSourceNode(),
 			"hcso_cce_node_pool":      cce.DataSourceCCENodePoolV3(),
 			"hcso_cce_nodes":          cce.DataSourceNodes(),
+
+			"hcso_dns_zones": dns.DataSourceZones(),
+
+			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
+
+			"hcso_images_image":  ims.DataSourceImagesImageV2(),
+			"hcso_images_images": ims.DataSourceImagesImages(),
+
+			"hcso_lb_listeners":    lb.DataSourceListeners(),
+			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
+
+			"hcso_vpc":                    vpc.DataSourceVpcV1(),
+			"hcso_vpcs":                   vpc.DataSourceVpcs(),
+			"hcso_vpc_subnet_ids":         vpc.DataSourceVpcSubnetIdsV1(),
+			"hcso_vpc_subnets":            vpc.DataSourceVpcSubnets(),
+			"hcso_networking_port":        vpc.DataSourceNetworkingPortV2(),
+			"hcso_vpc_peering_connection": vpc.DataSourceVpcPeeringConnectionV2(),
+			"hcso_networking_secgroups":   vpc.DataSourceNetworkingSecGroups(),
+
+			"hcso_vpc_bandwidth": eip.DataSourceBandWidth(),
+			"hcso_vpc_eip":       eip.DataSourceVpcEip(),
+			"hcso_vpc_eips":      eip.DataSourceVpcEips(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			// hcso_images_image depends on
 			"hcso_cbr_vault": cbr.ResourceVault(),
+
+			"hcso_cce_cluster":     cce.ResourceCluster(),
+			"hcso_cce_node":        cce.ResourceNode(),
+			"hcso_cce_node_attach": cce.ResourceNodeAttach(),
+			"hcso_cce_addon":       cce.ResourceAddon(),
+			"hcso_cce_node_pool":   cce.ResourceNodePool(),
 
 			"hcso_compute_keypair": huaweicloud.ResourceComputeKeypairV2(),
 
@@ -327,19 +347,6 @@ func Provider() *schema.Provider {
 			"hcso_images_image_share":          ims.ResourceImsImageShare(),
 			"hcso_images_image_share_accepter": ims.ResourceImsImageShareAccepter(),
 
-			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
-			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
-			"hcso_vpc_subnet":                      vpc.ResourceVpcSubnetV1(),
-			"hcso_vpc_peering_connection":          vpc.ResourceVpcPeeringConnectionV2(),
-			"hcso_vpc_peering_connection_accepter": vpc.ResourceVpcPeeringConnectionAccepterV2(),
-			"hcso_networking_secgroup":             vpc.ResourceNetworkingSecGroup(),
-			"hcso_networking_secgroup_rule":        vpc.ResourceNetworkingSecGroupRule(),
-			"hcso_networking_vip":                  vpc.ResourceNetworkingVip(),
-
-			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
-			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
-			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
-
 			"hcso_lb_l7policy":     lb.ResourceL7PolicyV2(),
 			"hcso_lb_l7rule":       lb.ResourceL7RuleV2(),
 			"hcso_lb_loadbalancer": lb.ResourceLoadBalancer(),
@@ -349,11 +356,24 @@ func Provider() *schema.Provider {
 			"hcso_lb_pool":         lb.ResourcePoolV2(),
 			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
 
-			"hcso_cce_cluster":     cce.ResourceCluster(),
-			"hcso_cce_node":        cce.ResourceNode(),
-			"hcso_cce_node_attach": cce.ResourceNodeAttach(),
-			"hcso_cce_addon":       cce.ResourceAddon(),
-			"hcso_cce_node_pool":   cce.ResourceNodePool(),
+			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
+			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
+			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+
+			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
+			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
+			"hcso_vpc_subnet":                      vpc.ResourceVpcSubnetV1(),
+			"hcso_vpc_peering_connection":          vpc.ResourceVpcPeeringConnectionV2(),
+			"hcso_vpc_peering_connection_accepter": vpc.ResourceVpcPeeringConnectionAccepterV2(),
+			"hcso_networking_secgroup":             vpc.ResourceNetworkingSecGroup(),
+			"hcso_networking_secgroup_rule":        vpc.ResourceNetworkingSecGroupRule(),
+			"hcso_networking_vip":                  vpc.ResourceNetworkingVip(),
+
+			"hcso_vpc_bandwidth":            eip.ResourceVpcBandWidthV1(),
+			"hcso_vpc_bandwidth_associate":  eip.ResourceBandWidthAssociate(),
+			"hcso_vpc_eip":                  eip.ResourceVpcEIPV1(),
+			"hcso_vpc_eip_associate":        eip.ResourceEIPAssociate(),
+			"hcso_networking_eip_associate": eip.ResourceEIPAssociate(),
 		},
 	}
 

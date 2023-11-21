@@ -104,71 +104,6 @@ func TestAccVpcBandWidth_WithEpsId(t *testing.T) {
 	})
 }
 
-func TestAccVpcBandWidth_prePaid(t *testing.T) {
-	var bandwidth bandwidths.BandWidth
-
-	randName := acceptance.RandomAccResourceName()
-	updateName := randName + "_update"
-	resourceName := "hcso_vpc_bandwidth.test"
-
-	rc := acceptance.InitResourceCheck(
-		resourceName,
-		&bandwidth,
-		getBandwidthResourceFunc,
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      rc.CheckResourceDestroy(),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccVpcBandWidth_prePaid(randName, 5, true),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "name", randName),
-					resource.TestCheckResourceAttr(resourceName, "size", "5"),
-					resource.TestCheckResourceAttr(resourceName, "share_type", "WHOLE"),
-					resource.TestCheckResourceAttr(resourceName, "status", "NORMAL"),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-				),
-			},
-			{
-				Config: testAccVpcBandWidth_prePaid(randName, 6, false),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", randName),
-					resource.TestCheckResourceAttr(resourceName, "size", "6"),
-					resource.TestCheckResourceAttr(resourceName, "share_type", "WHOLE"),
-					resource.TestCheckResourceAttr(resourceName, "status", "NORMAL"),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-				),
-			},
-			{
-				Config: testAccVpcBandWidth_prePaid(updateName, 6, true),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", updateName),
-					resource.TestCheckResourceAttr(resourceName, "size", "6"),
-					resource.TestCheckResourceAttr(resourceName, "share_type", "WHOLE"),
-					resource.TestCheckResourceAttr(resourceName, "status", "NORMAL"),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-				),
-			},
-			{
-				ResourceName:            resourceName,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"period", "period_unit", "auto_renew"},
-			},
-		},
-	})
-}
-
 func testAccVpcBandWidth_basic(rName string, size int) string {
 	return fmt.Sprintf(`
 resource "hcso_vpc_bandwidth" "test" {
@@ -186,18 +121,4 @@ resource "hcso_vpc_bandwidth" "test" {
   enterprise_project_id = "%s"
 }
 `, rName, size, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
-}
-
-func testAccVpcBandWidth_prePaid(rName string, size int, isAutoRenew bool) string {
-	return fmt.Sprintf(`
-resource "hcso_vpc_bandwidth" "test" {
-  name = "%s"
-  size = "%d"
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "%v"
-}
-`, rName, size, isAutoRenew)
 }

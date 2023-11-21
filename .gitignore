@@ -28,4 +28,4 @@ modules-dev/
 
 dist
 .devcontainer
-.vscode
+vendor
