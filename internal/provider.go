@@ -14,6 +14,8 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
@@ -298,7 +300,18 @@ func Provider() *schema.Provider {
 
 			"hcso_vpc": vpc.DataSourceVpcV1(),
 
-			"hso_evs_volumes": evs.DataSourceEvsVolumesV2(),
+			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
+			"hcso_dns_zones":   dns.DataSourceZones(),
+
+			"hcso_lb_listeners":    lb.DataSourceListeners(),
+			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
+
+			"hcso_cce_addon_template": cce.DataSourceAddonTemplate(),
+			"hcso_cce_cluster":        cce.DataSourceCCEClusterV3(),
+			"hcso_cce_clusters":       cce.DataSourceCCEClusters(),
+			"hcso_cce_node":           cce.DataSourceNode(),
+			"hcso_cce_node_pool":      cce.DataSourceCCENodePoolV3(),
+			"hcso_cce_nodes":          cce.DataSourceNodes(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -335,6 +348,12 @@ func Provider() *schema.Provider {
 			"hcso_lb_monitor":      lb.ResourceMonitorV2(),
 			"hcso_lb_pool":         lb.ResourcePoolV2(),
 			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
+
+			"hcso_cce_cluster":     cce.ResourceCluster(),
+			"hcso_cce_node":        cce.ResourceNode(),
+			"hcso_cce_node_attach": cce.ResourceNodeAttach(),
+			"hcso_cce_addon":       cce.ResourceAddon(),
+			"hcso_cce_node_pool":   cce.ResourceNodePool(),
 		},
 	}
 
