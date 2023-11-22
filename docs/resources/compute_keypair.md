@@ -4,7 +4,7 @@ subcategory: "Elastic Cloud Server (ECS)"
 
 # hcso_compute_keypair
 
-Manages a keypair resource within HuaweiCloud.
+Manages a keypair resource within Huawei Cloud Stack Online.
 
 ## Example Usage
 

@@ -18,10 +18,10 @@ import (
 func getDatabaseResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {
 	c, err := conf.DliV1Client(acceptance.HCSO_REGION_NAME)
 	if err != nil {
-		return nil, fmt.Errorf("error creating HuaweiCloud DLI v1 client: %s", err)
+		return nil, fmt.Errorf("error creating DLI v1 client: %s", err)
 	}
 
-	return dli.GetDliSqlDatabaseByName(c, state.Primary.ID)
+	return dli.GetDliSQLDatabaseByName(c, state.Primary.Attributes["name"])
 }
 
 func TestAccDliDatabase_basic(t *testing.T) {

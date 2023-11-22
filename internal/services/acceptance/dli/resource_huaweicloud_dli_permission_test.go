@@ -329,7 +329,7 @@ func TestAccResourceDliAuth_queue(t *testing.T) {
 }
 
 func testAccDliAuthResource_queue(name string, projectId string, privileges string) string {
-	queue := testAccDliQueue_basic(name, dli.CU_16)
+	queue := testAccDliQueue_basic(name, dli.CU16)
 	userConfig := testAccDliAuthUserConfig(name, projectId)
 
 	return fmt.Sprintf(`

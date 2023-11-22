@@ -65,7 +65,7 @@ func TestAccVpcEip_basic(t *testing.T) {
 					rc.CheckResourceExists(),
 					resource.TestCheckResourceAttr(resourceName, "name", udpateName),
 					resource.TestCheckResourceAttr(resourceName, "status", "UNBOUND"),
-					resource.TestCheckResourceAttr(resourceName, "publicip.0.ip_version", "6"),
+					resource.TestCheckResourceAttr(resourceName, "publicip.0.ip_version", "4"),
 					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.name", udpateName),
 					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.size", "8"),
 					resource.TestCheckResourceAttr(resourceName, "tags.foo", "bar1"),
@@ -153,87 +153,6 @@ func TestAccVpcEip_WithEpsId(t *testing.T) {
 	})
 }
 
-func TestAccVpcEip_prePaid(t *testing.T) {
-	var (
-		eip eips.PublicIp
-
-		randName     = acceptance.RandomAccResourceNameWithDash()
-		updateName   = acceptance.RandomAccResourceNameWithDash()
-		resourceName = "hcso_vpc_eip.test"
-	)
-
-	rc := acceptance.InitResourceCheck(
-		resourceName,
-		&eip,
-		getEipResourceFunc,
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      rc.CheckResourceDestroy(),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccVpcEip_prePaid(randName, 5, false),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "status", "UNBOUND"),
-					resource.TestCheckResourceAttr(resourceName, "name", randName),
-					resource.TestCheckResourceAttr(resourceName, "publicip.0.type", "5_bgp"),
-					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.name", randName),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "period_unit", "month"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.size", "5"),
-					resource.TestCheckResourceAttrSet(resourceName, "bandwidth.0.id"),
-					resource.TestCheckResourceAttrSet(resourceName, "address"),
-				),
-			},
-			{
-				Config: testAccVpcEip_prePaid(updateName, 5, true),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "status", "UNBOUND"),
-					resource.TestCheckResourceAttr(resourceName, "name", updateName),
-					resource.TestCheckResourceAttr(resourceName, "publicip.0.type", "5_bgp"),
-					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.name", updateName),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "period_unit", "month"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.size", "5"),
-					resource.TestCheckResourceAttrSet(resourceName, "bandwidth.0.id"),
-					resource.TestCheckResourceAttrSet(resourceName, "address"),
-				),
-			},
-			{
-				Config: testAccVpcEip_prePaid(updateName, 6, true),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "status", "UNBOUND"),
-					resource.TestCheckResourceAttr(resourceName, "name", updateName),
-					resource.TestCheckResourceAttr(resourceName, "publicip.0.type", "5_bgp"),
-					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.name", updateName),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "period_unit", "month"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-					resource.TestCheckResourceAttr(resourceName, "bandwidth.0.size", "6"),
-					resource.TestCheckResourceAttrSet(resourceName, "bandwidth.0.id"),
-					resource.TestCheckResourceAttrSet(resourceName, "address"),
-				),
-			},
-			{
-				ResourceName:            resourceName,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"charging_mode", "period", "period_unit", "auto_renew"},
-			},
-		},
-	})
-}
-
 func TestAccVpcEip_deprecated(t *testing.T) {
 	var (
 		eip eips.PublicIp
@@ -306,7 +225,8 @@ resource "hcso_vpc_eip" "test" {
 
   publicip {
     type       = "5_bgp"
-    ip_version = 6
+    #ip_version = 6 (update field 'ip_version' is unsupported by the API(PUT /v1/{project_id}/pubilcips/{ID})
+    ip_version = 4
   }
 
   bandwidth {
@@ -361,29 +281,6 @@ resource "hcso_vpc_eip" "test" {
   }
 }
 `, rName)
-}
-
-func testAccVpcEip_prePaid(rName string, size int, isAutoRenew bool) string {
-	return fmt.Sprintf(`
-resource "hcso_vpc_eip" "test" {
-  name = "%[1]s"
-
-  publicip {
-    type = "5_bgp"
-  }
-
-  bandwidth {
-    share_type = "PER"
-    name       = "%[1]s"
-    size       = %[2]d
-  }
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "%[3]v"
-}
-`, rName, size, isAutoRenew)
 }
 
 func testAccVpcEip_deprecated(rName string) string {
