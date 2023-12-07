@@ -150,17 +150,6 @@ resource "hcso_networking_secgroup" "test" {
   name = "%[1]s"
 }
 
-resource "hcso_apig_instance" "test" {
-  name                  = "%[1]s"
-  edition               = "BASIC"
-  vpc_id                = hcso_vpc.test.id
-  subnet_id             = hcso_vpc_subnet.test.id
-  security_group_id     = hcso_networking_secgroup.test.id
-  enterprise_project_id = "0"
-
-  availability_zones = try(slice(data.hcso_availability_zones.test.names, 0, 1), null)
-}
-
 data "hcso_compute_flavors" "test" {
   availability_zone = data.hcso_availability_zones.test.names[0]
   performance_type  = "normal"
@@ -182,7 +171,6 @@ resource "hcso_compute_instance" "test" {
   security_group_ids = [hcso_networking_secgroup.test.id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
   system_disk_type   = "SSD"
-
   network {
     uuid = hcso_vpc_subnet.test.id
   }

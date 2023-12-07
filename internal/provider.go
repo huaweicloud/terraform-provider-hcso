@@ -298,7 +298,10 @@ func Provider() *schema.Provider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"hcso_availability_zones": huaweicloud.DataSourceAvailabilityZones(),
 
-			"hcso_compute_flavors": ecs.DataSourceEcsFlavors(),
+			"hcso_compute_flavors":      ecs.DataSourceEcsFlavors(),
+			"hcso_compute_instance":     ecs.DataSourceComputeInstance(),
+			"hcso_compute_instances":    ecs.DataSourceComputeInstances(),
+			"hcso_compute_servergroups": ecs.DataSourceComputeServerGroups(),
 
 			"hcso_cce_addon_template": cce.DataSourceAddonTemplate(),
 			"hcso_cce_cluster":        cce.DataSourceCCEClusterV3(),
@@ -339,7 +342,12 @@ func Provider() *schema.Provider {
 			"hcso_cce_addon":       cce.ResourceAddon(),
 			"hcso_cce_node_pool":   cce.ResourceNodePool(),
 
-			"hcso_compute_keypair": huaweicloud.ResourceComputeKeypairV2(),
+			"hcso_compute_instance":         ecs.ResourceComputeInstance(),
+			"hcso_compute_servergroup":      ecs.ResourceComputeServerGroup(),
+			"hcso_compute_interface_attach": ecs.ResourceComputeInterfaceAttach(),
+			"hcso_compute_keypair":          huaweicloud.ResourceComputeKeypairV2(),
+			"hcso_compute_eip_associate":    ecs.ResourceComputeEIPAssociate(),
+			"hcso_compute_volume_attach":    ecs.ResourceComputeVolumeAttach(),
 
 			"hcso_evs_volume": evs.ResourceEvsVolume(),
 

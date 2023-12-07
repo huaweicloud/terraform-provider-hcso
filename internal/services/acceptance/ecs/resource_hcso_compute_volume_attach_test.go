@@ -56,7 +56,7 @@ func TestAccComputeVolumeAttach_basic(t *testing.T) {
 					resource.TestCheckResourceAttrPair(resourceName, "instance_id",
 						"hcso_compute_instance.instance_1", "id"),
 					resource.TestCheckResourceAttrPair(resourceName, "volume_id", "hcso_evs_volume.test", "id"),
-					resource.TestCheckResourceAttrSet(resourceName, "pci_address"),
+					resource.TestCheckResourceAttr(resourceName, "pci_address", ""),
 				),
 			},
 			{
@@ -91,7 +91,7 @@ func TestAccComputeVolumeAttach_device(t *testing.T) {
 						"hcso_compute_instance.instance_1", "id"),
 					resource.TestCheckResourceAttrPair(resourceName, "volume_id", "hcso_evs_volume.test", "id"),
 					resource.TestCheckResourceAttr(resourceName, "device", "/dev/vdb"),
-					resource.TestCheckResourceAttrSet(resourceName, "pci_address"),
+					resource.TestCheckResourceAttr(resourceName, "pci_address", ""),
 				),
 			},
 		},
@@ -137,7 +137,7 @@ func testAccComputeVolumeAttach_basic(rName string) string {
 resource "hcso_evs_volume" "test" {
   name              = "%s"
   availability_zone = data.hcso_availability_zones.test.names[0]
-  volume_type       = "SAS"
+  volume_type       = "SSD"
   size              = 10
 }
 
@@ -145,10 +145,11 @@ resource "hcso_compute_instance" "instance_1" {
   name               = "%s"
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
+  security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
+  system_disk_type   = "SSD"
   network {
-    uuid = data.hcso_vpc_subnet.test.id
+    uuid = data.hcso_vpc_subnets.test.subnets[0].id
   }
 }
 
@@ -166,7 +167,7 @@ func testAccComputeVolumeAttach_device(rName string) string {
 resource "hcso_evs_volume" "test" {
   name              = "%s"
   availability_zone = data.hcso_availability_zones.test.names[0]
-  volume_type       = "SAS"
+  volume_type       = "SSD"
   size              = 10
 }
 
@@ -174,10 +175,11 @@ resource "hcso_compute_instance" "instance_1" {
   name               = "%s"
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
+  security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
+  system_disk_type   = "SSD"
   network {
-    uuid = data.hcso_vpc_subnet.test.id
+    uuid = data.hcso_vpc_subnets.test.subnets[0].id
   }
 }
 
@@ -196,7 +198,7 @@ func testAccComputeVolumeAttach_multiple(rName string) string {
 resource "hcso_evs_volume" "test" {
   name              = "%[2]s"
   availability_zone = data.hcso_availability_zones.test.names[0]
-  volume_type       = "SAS"
+  volume_type       = "SSD"
   size              = 10
   
   multiattach = true
@@ -208,11 +210,11 @@ resource "hcso_compute_instance" "test" {
   name               = "%[2]s-${count.index}"
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
+  security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
-
+  system_disk_type   = "SSD"
   network {
-    uuid = data.hcso_vpc_subnet.test.id
+    uuid = data.hcso_vpc_subnets.test.subnets[0].id
   }
 }
 

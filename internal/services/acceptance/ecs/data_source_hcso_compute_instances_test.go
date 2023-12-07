@@ -60,11 +60,11 @@ resource "hcso_compute_instance" "test" {
   name               = "%s"
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
+  security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
-
+  system_disk_type   = "SSD"
   network {
-    uuid = data.hcso_vpc_subnet.test.id
+    uuid = data.hcso_vpc_subnets.test.subnets[0].id
   }
 
   tags = {
