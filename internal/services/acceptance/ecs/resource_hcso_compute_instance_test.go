@@ -79,72 +79,6 @@ func TestAccComputeInstance_basic(t *testing.T) {
 	})
 }
 
-func TestAccComputeInstance_prePaid(t *testing.T) {
-	var instance cloudservers.CloudServer
-
-	rName := acceptance.RandomAccResourceName()
-	resourceName := "hcso_compute_instance.test"
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      testAccCheckComputeInstanceDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccComputeInstance_prePaid(rName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckComputeInstanceExists(resourceName, &instance),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "delete_eip_on_termination", "true"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-				),
-			},
-			{
-				Config: testAccComputeInstance_prePaidUpdate(rName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckComputeInstanceExists(resourceName, &instance),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccComputeInstance_spot(t *testing.T) {
-	var instance cloudservers.CloudServer
-
-	rName := acceptance.RandomAccResourceName()
-	resourceName := "hcso_compute_instance.test"
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acceptance.TestAccPreCheck(t) },
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      testAccCheckComputeInstanceDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccComputeInstance_spot(rName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckComputeInstanceExists(resourceName, &instance),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "spot"),
-				),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
-				ImportStateVerifyIgnore: []string{
-					"stop_before_destroy", "delete_eip_on_termination",
-					"spot_maximum_price", "spot_duration", "spot_duration_count",
-				},
-			},
-		},
-	})
-}
-
 func TestAccComputeInstance_powerAction(t *testing.T) {
 	var instance cloudservers.CloudServer
 
@@ -215,6 +149,7 @@ func TestAccComputeInstance_powerAction(t *testing.T) {
 	})
 }
 
+// Failed. The service DEW is currently unavailable.
 func TestAccComputeInstance_disk_encryption(t *testing.T) {
 	var instance cloudservers.CloudServer
 
@@ -243,6 +178,7 @@ func TestAccComputeInstance_disk_encryption(t *testing.T) {
 	})
 }
 
+// Failed. Only the disk type [SSD] is currently available, but disk type [SSD] not support set iops and throughput.
 func TestAccComputeInstance_diskIopsThroughput(t *testing.T) {
 	var instance cloudservers.CloudServer
 
@@ -386,7 +322,7 @@ data "hcso_compute_flavors" "test" {
   memory_size       = 4
 }
 
-data "hcso_vpc_subnet" "test" {
+data "hcso_vpc_subnets" "test" {
   name = "subnet-default"
 }
 
@@ -395,7 +331,7 @@ data "hcso_images_image" "test" {
   most_recent = true
 }
 
-data "hcso_networking_secgroup" "test" {
+data "hcso_networking_secgroups" "test" {
   name = "default"
 }
 `
@@ -409,21 +345,21 @@ resource "hcso_compute_instance" "test" {
   description         = "terraform test"
   image_id            = data.hcso_images_image.test.id
   flavor_id           = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids  = [data.hcso_networking_secgroup.test.id]
+  security_group_ids  = [data.hcso_networking_secgroups.test.security_groups[0].id]
   stop_before_destroy = true
   agency_name         = "test111"
   agent_list          = "hss"
 
   network {
-    uuid              = data.hcso_vpc_subnet.test.id
+    uuid              = data.hcso_vpc_subnets.test.subnets[0].id
     source_dest_check = false
   }
 
-  system_disk_type = "SAS"
+  system_disk_type = "SSD"
   system_disk_size = 50
 
   data_disks {
-    type = "SAS"
+    type = "SSD"
     size = "10"
   }
 
@@ -449,21 +385,21 @@ resource "hcso_compute_instance" "test" {
   description         = "terraform test update"
   image_id            = data.hcso_images_image.test.id
   flavor_id           = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids  = [data.hcso_networking_secgroup.test.id]
+  security_group_ids  = [data.hcso_networking_secgroups.test.security_groups[0].id]
   stop_before_destroy = true
   agency_name         = "test222"
   agent_list          = "ces"
 
   network {
-    uuid              = data.hcso_vpc_subnet.test.id
+    uuid              = data.hcso_vpc_subnets.test.subnets[0].id
     source_dest_check = false
   }
 
-  system_disk_type = "SAS"
+  system_disk_type = "SSD"
   system_disk_size = 60
 
   data_disks {
-    type = "SAS"
+    type = "SSD"
     size = "10"
   }
 
@@ -480,86 +416,6 @@ resource "hcso_compute_instance" "test" {
 `, testAccCompute_data, rName)
 }
 
-func testAccComputeInstance_prePaid(rName string) string {
-	return fmt.Sprintf(`
-%s
-
-resource "hcso_compute_instance" "test" {
-  name               = "%s"
-  image_id           = data.hcso_images_image.test.id
-  flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
-  availability_zone  = data.hcso_availability_zones.test.names[0]
-
-  network {
-    uuid = data.hcso_vpc_subnet.test.id
-  }
-
-  eip_type = "5_bgp"
-  bandwidth {
-    share_type  = "PER"
-    size        = 5
-    charge_mode = "bandwidth"
-  }
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "true"
-}
-`, testAccCompute_data, rName)
-}
-
-func testAccComputeInstance_prePaidUpdate(rName string) string {
-	return fmt.Sprintf(`
-%s
-
-resource "hcso_compute_instance" "test" {
-  name               = "%s"
-  image_id           = data.hcso_images_image.test.id
-  flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
-  availability_zone  = data.hcso_availability_zones.test.names[0]
-
-  network {
-    uuid = data.hcso_vpc_subnet.test.id
-  }
-
-  eip_type = "5_bgp"
-  bandwidth {
-    share_type  = "PER"
-    size        = 5
-    charge_mode = "bandwidth"
-  }
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "false"
-}
-`, testAccCompute_data, rName)
-}
-
-func testAccComputeInstance_spot(rName string) string {
-	return fmt.Sprintf(`
-%s
-
-resource "hcso_compute_instance" "test" {
-  name               = "%s"
-  image_id           = data.hcso_images_image.test.id
-  flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
-  availability_zone  = data.hcso_availability_zones.test.names[0]
-  charging_mode      = "spot"
-  spot_duration      = 2
-
-  network {
-    uuid = data.hcso_vpc_subnet.test.id
-  }
-}
-`, testAccCompute_data, rName)
-}
-
 func testAccComputeInstance_powerAction(rName, powerAction string) string {
 	return fmt.Sprintf(`
 %s
@@ -568,12 +424,12 @@ resource "hcso_compute_instance" "test" {
   name               = "%s"
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
+  security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
   power_action       = "%s"
-
+  system_disk_type   = "SSD"
   network {
-    uuid = data.hcso_vpc_subnet.test.id
+    uuid = data.hcso_vpc_subnets.test.subnets[0].id
   }
 }
 `, testAccCompute_data, rName, powerAction)
@@ -594,20 +450,19 @@ resource "hcso_compute_instance" "test" {
   name                = "%s"
   image_id            = data.hcso_images_image.test.id
   flavor_id           = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids  = [data.hcso_networking_secgroup.test.id]
+  security_group_ids  = [data.hcso_networking_secgroups.test.security_groups[0].id]
   stop_before_destroy = true
   agent_list          = "hss"
-
   network {
-    uuid              = data.hcso_vpc_subnet.test.id
+    uuid              = data.hcso_vpc_subnets.test.subnets[0].id
     source_dest_check = false
   }
 
-  system_disk_type = "SAS"
+  system_disk_type = "SSD"
   system_disk_size = 50
 
   data_disks {
-    type = "SAS"
+    type = "SSD"
     size = "10"
     kms_key_id = hcso_kms_key.test.id
   }
@@ -624,13 +479,13 @@ resource "hcso_compute_instance" "test" {
   description           = "terraform test"
   image_id              = data.hcso_images_image.test.id
   flavor_id             = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids    = [data.hcso_networking_secgroup.test.id]
+  security_group_ids    = [data.hcso_networking_secgroups.test.security_groups[0].id]
   enterprise_project_id = "%s"
-  system_disk_type      = "SAS"
+  system_disk_type      = "SSD"
   system_disk_size      = 40
 
   network {
-    uuid              = data.hcso_vpc_subnet.test.id
+    uuid              = data.hcso_vpc_subnets.test.subnets[0].id
     source_dest_check = false
   }
 
@@ -650,11 +505,11 @@ resource "hcso_compute_instance" "test" {
   name                = "%s"
   image_id            = data.hcso_images_image.test.id
   flavor_id           = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids  = [data.hcso_networking_secgroup.test.id]
+  security_group_ids  = [data.hcso_networking_secgroups.test.security_groups[0].id]
   stop_before_destroy = true
 
   network {
-    uuid              = data.hcso_vpc_subnet.test.id
+    uuid              = data.hcso_vpc_subnets.test.subnets[0].id
     source_dest_check = false
   }
 

@@ -106,5 +106,5 @@ This resource provides the following timeouts configuration options:
 ELB monitor can be imported using the monitor ID, e.g.
 
 ```
-$ terraform import huaweicloud_lb_monitor.monitor_1 5c20fdad-7288-11eb-b817-0255ac10158b
+$ terraform import hcso_lb_monitor.monitor_1 5c20fdad-7288-11eb-b817-0255ac10158b
 ```
