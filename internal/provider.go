@@ -365,9 +365,12 @@ func Provider() *schema.Provider {
 			"hcso_lb_pool":         lb.ResourcePoolV2(),
 			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
 
+			"hcso_nat_gateway":            nat.ResourcePublicGateway(),
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+			"hcso_nat_private_dnat_rule":  nat.ResourcePrivateDnatRule(),
+			"hcso_nat_snat_rule":          nat.ResourcePublicSnatRule(),
 
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
