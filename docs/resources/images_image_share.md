@@ -10,7 +10,9 @@ Manages an IMS image share resource within Huawei Cloud Stack Online.
 
 ```hcl
 variable "source_image_id" {}
-variable "target_project_ids" {}
+variable "target_project_ids" {
+  type = set(string)
+}
 
 resource "hcso_images_image_share" "test" {
   source_image_id    = var.source_image_id
