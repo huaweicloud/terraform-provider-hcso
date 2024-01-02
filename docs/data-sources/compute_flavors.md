@@ -9,9 +9,10 @@ Use this data source to get the available Compute Flavors.
 ## Example Usage
 
 ```hcl
+data "hcso_availability_zones" "zones" {}
+
 data "hcso_compute_flavors" "flavors" {
-  availability_zone = "cn-north-1a"
-  performance_type  = "normal"
+  availability_zone = data.hcso_availability_zones.zones.names[0]
   cpu_core_count    = 2
   memory_size       = 4
 }
