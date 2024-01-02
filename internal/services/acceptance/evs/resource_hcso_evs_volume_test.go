@@ -17,7 +17,7 @@ import (
 func getVolumeResourceFunc(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {
 	c, err := conf.BlockStorageV2Client(acceptance.HCSO_REGION_NAME)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating HuaweiCloud block storage v2 client: %s", err)
+		return nil, fmt.Errorf("error creating Huawei Cloud Stack Online block storage v2 client: %s", err)
 	}
 	return cloudvolumes.Get(c, state.Primary.ID).Extract()
 }
@@ -76,7 +76,7 @@ func TestAccEvsVolume_basic(t *testing.T) {
 			{
 				Config: testAccEvsVolume_update(rName),
 				Check: resource.ComposeTestCheckFunc(
-					rc.CheckMultiResourcesExists(6),
+					rc.CheckMultiResourcesExists(4),
 					// Common configuration
 					resource.TestCheckResourceAttrPair(resourceName1, "availability_zone",
 						"data.hcso_availability_zones.test", "names.0"),
@@ -138,54 +138,54 @@ func TestAccEvsVolume_withEpsId(t *testing.T) {
 }
 
 func testAccEvsVolume_base() string {
-	return fmt.Sprintf(`
-variable "volume_configuration" {
-  type = list(object({
-    suffix      = string
-    device_type = string
-    volume_type = string
-    multiattach = bool
-    iops        = number
-    throughput  = number
-  }))
-  default = [
-    {
-      suffix = "vbd_normal_volume",
-      device_type = "VBD",
-      volume_type = "SSD",
-      multiattach = false,
-      iops = 0,
-      throughput = 0
-    },
-    {
-      suffix = "vbd_share_volume",
-      device_type = "VBD",
-      volume_type = "SSD",
-      multiattach = true,
-      iops = 0,
-      throughput = 0
-    },
-    {
-      suffix = "scsi_normal_volume",
-      device_type = "SCSI",
-      volume_type = "SSD",
-      multiattach = false,
-      iops = 0,
-      throughput = 0
-    },
-    {
-      suffix = "scsi_share_volume",
-      device_type = "SCSI",
-      volume_type = "SSD",
-      multiattach = true,
-      iops = 0,
-      throughput = 0
-    },
-  ]
-}
-
-data "hcso_availability_zones" "test" {}
-`)
+	return `
+	variable "volume_configuration" {
+	  type = list(object({
+		suffix      = string
+		device_type = string
+		volume_type = string
+		multiattach = bool
+		iops        = number
+		throughput  = number
+	  }))
+	  default = [
+		{
+		  suffix = "vbd_normal_volume",
+		  device_type = "VBD",
+		  volume_type = "SSD",
+		  multiattach = false,
+		  iops = 0,
+		  throughput = 0
+		},
+		{
+		  suffix = "vbd_share_volume",
+		  device_type = "VBD",
+		  volume_type = "SSD",
+		  multiattach = true,
+		  iops = 0,
+		  throughput = 0
+		},
+		{
+		  suffix = "scsi_normal_volume",
+		  device_type = "SCSI",
+		  volume_type = "SSD",
+		  multiattach = false,
+		  iops = 0,
+		  throughput = 0
+		},
+		{
+		  suffix = "scsi_share_volume",
+		  device_type = "SCSI",
+		  volume_type = "SSD",
+		  multiattach = true,
+		  iops = 0,
+		  throughput = 0
+		},
+	  ]
+	}
+	
+	data "hcso_availability_zones" "test" {}
+	`
 }
 
 func testAccEvsVolume_basic(rName string) string {
@@ -251,56 +251,4 @@ resource "hcso_evs_volume" "test" {
   enterprise_project_id = "%s"
 }
 `, rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
-}
-
-func testAccEvsVolume_prepaid_base() string {
-	return fmt.Sprintf(`
-variable "volume_configuration" {
-  type = list(object({
-    suffix      = string
-    volume_type = string
-    iops        = number
-    throughput  = number
-  }))
-  default = [
-    {
-      suffix = "ssd_volume",
-      volume_type = "SSD",
-      iops = 0,
-      throughput = 0
-    },
-    {
-      suffix = "gpssd2_volume",
-      volume_type = "GPSSD2",
-      iops = 3000,
-      throughput = 500
-    },
-  ]
-}
-
-data "hcso_availability_zones" "test" {}
-`)
-}
-
-func testAccEvsVolume_prePaid(rName string, isAutoRenew bool) string {
-	return fmt.Sprintf(`
-%[1]s
-
-resource "hcso_evs_volume" "test" {
-  count = length(var.volume_configuration)
-
-  name              = "%s_${var.volume_configuration[count.index].suffix}"
-  description       = "test volume for charging mode"
-  availability_zone = data.hcso_availability_zones.test.names[0]
-  size              = 100
-  volume_type       = var.volume_configuration[count.index].volume_type
-  iops              = var.volume_configuration[count.index].iops
-  throughput        = var.volume_configuration[count.index].throughput
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "%[3]v"
-}
-`, testAccEvsVolume_prepaid_base(), rName, isAutoRenew)
 }
