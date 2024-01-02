@@ -349,7 +349,8 @@ func Provider() *schema.Provider {
 			"hcso_compute_eip_associate":    ecs.ResourceComputeEIPAssociate(),
 			"hcso_compute_volume_attach":    ecs.ResourceComputeVolumeAttach(),
 
-			"hcso_evs_volume": evs.ResourceEvsVolume(),
+			"hcso_evs_snapshot": evs.ResourceEvsSnapshotV2(),
+			"hcso_evs_volume":   evs.ResourceEvsVolume(),
 
 			"hcso_images_image":                ims.ResourceImsImage(),
 			"hcso_images_image_copy":           ims.ResourceImsImageCopy(),

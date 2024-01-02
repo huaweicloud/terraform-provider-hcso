@@ -52,13 +52,12 @@ data "hcso_availability_zones" "test" {}
 
 data "hcso_compute_flavors" "test" {
   availability_zone = data.hcso_availability_zones.test.names[0]
-  performance_type  = "normal"
   cpu_core_count    = 2
   memory_size       = 4
 }
 
 data "hcso_images_image" "test" {
-  name        = "Ubuntu 18.04 server 64bit"
+  name_regix        = "^Ubuntu 18.04 server 64bit"
   most_recent = true
 }
 `, TestBaseNetwork(name))
