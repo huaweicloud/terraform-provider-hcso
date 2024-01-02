@@ -11,7 +11,7 @@ Manages an EIP resource within Huawei Cloud Stack Online.
 ### Create an EIP with Dedicated Bandwidth
 
 ```hcl
-var "bandwidth_name" {}
+variable "bandwidth_name" {}
 
 resource "hcso_vpc_eip" "dedicated" {
   publicip {
