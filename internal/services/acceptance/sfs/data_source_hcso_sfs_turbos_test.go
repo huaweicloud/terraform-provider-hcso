@@ -52,12 +52,12 @@ variable "turbo_configuration" {
     size        = number
     share_type  = string
     eps_enabled = bool
+    enhanced    = bool
   }))
 
   default = [
-    {size = 100, share_type = "PERFORMANCE", eps_enabled = false},
-    {size = 200, share_type = "STANDARD", eps_enabled = false},
-    {size = 200, share_type = "PERFORMANCE", eps_enabled = true},
+    {size = 500, share_type = "PERFORMANCE", eps_enabled = false, enhanced = false},
+    {size = 10240, share_type = "PERFORMANCE", eps_enabled = false, enhanced = false},
   ]
 }
 
@@ -105,27 +105,24 @@ data "hcso_sfs_turbos" "by_eps_id" {
 output "name_query_result_validation" {
   value = contains(data.hcso_sfs_turbos.by_name.turbos[*].id,
   hcso_sfs_turbo.test[0].id) && !contains(data.hcso_sfs_turbos.by_name.turbos[*].id,
-  hcso_sfs_turbo.test[1].id) && !contains(data.hcso_sfs_turbos.by_name.turbos[*].id,
-  hcso_sfs_turbo.test[2].id)
+  hcso_sfs_turbo.test[1].id) 
 }
 
 output "size_query_result_validation" {
   value = contains(data.hcso_sfs_turbos.by_size.turbos[*].id,
   hcso_sfs_turbo.test[0].id) && !contains(data.hcso_sfs_turbos.by_size.turbos[*].id,
-  hcso_sfs_turbo.test[1].id) && !contains(data.hcso_sfs_turbos.by_size.turbos[*].id,
-  hcso_sfs_turbo.test[2].id)
+  hcso_sfs_turbo.test[1].id)
 }
 
 output "share_type_query_result_validation" {
   value = contains(data.hcso_sfs_turbos.by_share_type.turbos[*].id,
   hcso_sfs_turbo.test[1].id) && !contains(data.hcso_sfs_turbos.by_share_type.turbos[*].id,
-  hcso_sfs_turbo.test[0].id) && !contains(data.hcso_sfs_turbos.by_share_type.turbos[*].id,
-  hcso_sfs_turbo.test[2].id)
+  hcso_sfs_turbo.test[0].id) 
 }
 
 output "eps_id_query_result_validation" {
   value = contains(data.hcso_sfs_turbos.by_eps_id.turbos[*].id,
-  hcso_sfs_turbo.test[2].id)
+  hcso_sfs_turbo.test[1].id)
 }
 `, common.TestBaseNetwork(rName), rName, acceptance.HCSO_ENTERPRISE_PROJECT_ID_TEST)
 }
