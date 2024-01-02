@@ -270,6 +270,13 @@ func TestAccPreCheck(t *testing.T) {
 }
 
 // lintignore:AT003
+func TestAccPreCheckDestProjectIds(t *testing.T) {
+	if HCSO_DEST_PROJECT_ID == "" || HCSO_DEST_PROJECT_ID_TEST == "" {
+		t.Skip("HCSO_DEST_PROJECT_ID and HCSO_DEST_PROJECT_ID_TEST must be set for acceptance test.")
+	}
+}
+
+// lintignore:AT003
 func TestAccPrecheckDomainId(t *testing.T) {
 	if HCSO_DOMAIN_ID == "" {
 		t.Skip("HCSO_DOMAIN_ID must be set for acceptance tests")

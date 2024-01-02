@@ -44,7 +44,7 @@ func TestAccPolicy_basic(t *testing.T) {
 		CheckDestroy:      rc.CheckResourceDestroy(),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccPolicy_basic_step1(name),
+				Config: testAccPolicyBasicStep1(name),
 				Check: resource.ComposeTestCheckFunc(
 					rc.CheckResourceExists(),
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -57,7 +57,7 @@ func TestAccPolicy_basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccPolicy_basic_step2(updateName),
+				Config: testAccPolicyBasicStep2(updateName),
 				Check: resource.ComposeTestCheckFunc(
 					rc.CheckResourceExists(),
 					resource.TestCheckResourceAttr(resourceName, "name", updateName),
@@ -78,7 +78,7 @@ func TestAccPolicy_basic(t *testing.T) {
 	})
 }
 
-func testAccPolicy_basic_step1(name string) string {
+func testAccPolicyBasicStep1(name string) string {
 	return fmt.Sprintf(`
 resource "hcso_cbr_policy" "test" {
   name        = "%s"
@@ -93,7 +93,7 @@ resource "hcso_cbr_policy" "test" {
 `, name)
 }
 
-func testAccPolicy_basic_step2(name string) string {
+func testAccPolicyBasicStep2(name string) string {
 	return fmt.Sprintf(`
 resource "hcso_cbr_policy" "test" {
   name            = "%s"
