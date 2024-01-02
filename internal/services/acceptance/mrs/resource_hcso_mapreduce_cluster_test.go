@@ -110,26 +110,17 @@ func TestAccMrsMapReduceCluster_analysis(t *testing.T) {
 	resourceName := "hcso_mapreduce_cluster.test"
 	rName := acceptance.RandomAccResourceNameWithDash()
 	password := acceptance.RandomPassword()
-
+	components := "\"Hadoop\", \"ZooKeeper\", \"Ranger\""
+	// When update the node_number of analysis cluster, the default components
+	// 'DBService','Hadoop','ZooKeeper','Ranger','JobGateway' must be added into the list
+	componentsContainsDefaults := "\"DBService\",\"Hadoop\",\"ZooKeeper\",\"Ranger\",\"JobGateway\""
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { acceptance.TestAccPreCheck(t) },
 		ProviderFactories: acceptance.TestAccProviderFactories,
 		CheckDestroy:      testAccCheckMRSV2ClusterDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMrsMapReduceClusterConfig_analysis(rName, password, buildGroupNodeNumbers(2, 0, 1, 0)),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "type", "ANALYSIS"),
-					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
-					resource.TestCheckResourceAttr(resourceName, "status", "running"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "1"),
-				),
-			},
-			{
-				Config: testAccMrsMapReduceClusterConfig_analysis(rName, password, buildGroupNodeNumbers(3, 0, 2, 0)),
+				Config: testAccMrsMapReduceClusterConfig_analysis(rName, password, components, buildGroupNodeNumbers(3, 0, 1, 0)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
@@ -137,18 +128,30 @@ func TestAccMrsMapReduceCluster_analysis(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
 					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "3"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "1"),
 				),
 			},
 			{
-				Config: testAccMrsMapReduceClusterConfig_analysis(rName, password, buildGroupNodeNumbers(2, 0, 1, 0)),
+				Config: testAccMrsMapReduceClusterConfig_analysis(rName, password, componentsContainsDefaults, buildGroupNodeNumbers(4, 0, 2, 0)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
 					resource.TestCheckResourceAttr(resourceName, "type", "ANALYSIS"),
 					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "4"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "2"),
+				),
+			},
+			{
+				Config: testAccMrsMapReduceClusterConfig_analysis(rName, password, componentsContainsDefaults, buildGroupNodeNumbers(3, 0, 1, 0)),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "type", "ANALYSIS"),
+					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "status", "running"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "3"),
 					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "1"),
 				),
 			},
@@ -170,26 +173,16 @@ func TestAccMrsMapReduceCluster_stream(t *testing.T) {
 	resourceName := "hcso_mapreduce_cluster.test"
 	rName := acceptance.RandomAccResourceNameWithDash()
 	password := acceptance.RandomPassword()
-
+	components := "\"Ranger\""
+	// When update the node_number of streaming cluster, the default components 'DBService' must be added into the list
+	componentsContainsDefaults := "\"Ranger\", \"DBService\""
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { acceptance.TestAccPreCheck(t) },
 		ProviderFactories: acceptance.TestAccProviderFactories,
 		CheckDestroy:      testAccCheckMRSV2ClusterDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMrsMapReduceClusterConfig_stream(rName, password, buildGroupNodeNumbers(0, 2, 0, 1)),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "type", "STREAMING"),
-					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
-					resource.TestCheckResourceAttr(resourceName, "status", "running"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "1"),
-				),
-			},
-			{
-				Config: testAccMrsMapReduceClusterConfig_stream(rName, password, buildGroupNodeNumbers(0, 3, 0, 2)),
+				Config: testAccMrsMapReduceClusterConfig_stream(rName, password, components, buildGroupNodeNumbers(0, 3, 0, 1)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
@@ -197,19 +190,37 @@ func TestAccMrsMapReduceCluster_stream(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
 					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "3"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "2"),
+					// streaming_task_nodes is only supported when the component list contains "Storm"
+					// but "Storm" is not in the variable component list
+					// resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "1"),
 				),
 			},
 			{
-				Config: testAccMrsMapReduceClusterConfig_stream(rName, password, buildGroupNodeNumbers(0, 2, 0, 1)),
+				Config: testAccMrsMapReduceClusterConfig_stream(rName, password, componentsContainsDefaults, buildGroupNodeNumbers(0, 4, 0, 2)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
 					resource.TestCheckResourceAttr(resourceName, "type", "STREAMING"),
 					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "1"),
+					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "4"),
+					// streaming_task_nodes is only supported when the component list contains "Storm"
+					// but "Storm" is not in the variable component list
+					// resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "2"),
+				),
+			},
+			{
+				Config: testAccMrsMapReduceClusterConfig_stream(rName, password, componentsContainsDefaults, buildGroupNodeNumbers(0, 3, 0, 1)),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "type", "STREAMING"),
+					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "status", "running"),
+					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "3"),
+					// streaming_task_nodes is only supported when the component list contains "Storm"
+					// but "Storm" is not in the variable component list
+					// resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "1"),
 				),
 			},
 			{
@@ -230,6 +241,11 @@ func TestAccMrsMapReduceCluster_hybrid(t *testing.T) {
 	resourceName := "hcso_mapreduce_cluster.test"
 	rName := acceptance.RandomAccResourceNameWithDash()
 	password := acceptance.RandomPassword()
+	components := "\"Tez\",\"Hive\",\"Kafka\",\"Flume\",\"Hadoop\", \"ZooKeeper\", \"Ranger\""
+	// When update the node_number of mixed cluster, the default components
+	// 'DBService','Hadoop','ZooKeeper','Ranger','JobGateway' must be added into the list
+	componentsContainsDefaults := "\"Tez\",\"Hive\",\"Kafka\",\"Flume\",\"Hadoop\",\"ZooKeeper\",\"Ranger\"," +
+		"\"DBService\", \"JobGateway\""
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { acceptance.TestAccPreCheck(t) },
@@ -237,25 +253,7 @@ func TestAccMrsMapReduceCluster_hybrid(t *testing.T) {
 		CheckDestroy:      testAccCheckMRSV2ClusterDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMrsMapReduceClusterConfig_hybrid(rName, password, buildGroupNodeNumbers(2, 2, 1, 1)),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "type", "MIXED"),
-					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
-					resource.TestCheckResourceAttr(resourceName, "status", "running"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "1"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "1"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.host_ips.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.host_ips.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.host_ips.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.host_ips.#", "1"),
-				),
-			},
-			{
-				Config: testAccMrsMapReduceClusterConfig_hybrid(rName, password, buildGroupNodeNumbers(3, 3, 2, 2)),
+				Config: testAccMrsMapReduceClusterConfig_hybrid(rName, password, components, buildGroupNodeNumbers(3, 3, 1, 0)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
@@ -264,30 +262,42 @@ func TestAccMrsMapReduceCluster_hybrid(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
 					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "3"),
 					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "3"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "1"),
 					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.host_ips.#", "3"),
 					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.host_ips.#", "3"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.host_ips.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.host_ips.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.host_ips.#", "1"),
 				),
 			},
 			{
-				Config: testAccMrsMapReduceClusterConfig_hybrid(rName, password, buildGroupNodeNumbers(2, 2, 1, 1)),
+				Config: testAccMrsMapReduceClusterConfig_hybrid(rName, password, componentsContainsDefaults, buildGroupNodeNumbers(4, 4, 2, 0)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
 					resource.TestCheckResourceAttr(resourceName, "type", "MIXED"),
 					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "4"),
+					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "4"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.host_ips.#", "4"),
+					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.host_ips.#", "4"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.host_ips.#", "2"),
+				),
+			},
+			{
+				Config: testAccMrsMapReduceClusterConfig_hybrid(rName, password, componentsContainsDefaults, buildGroupNodeNumbers(3, 3, 1, 0)),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "type", "MIXED"),
+					resource.TestCheckResourceAttr(resourceName, "safe_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "status", "running"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.node_number", "3"),
+					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.node_number", "3"),
 					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.node_number", "1"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.node_number", "1"),
-					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.host_ips.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.host_ips.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "analysis_core_nodes.0.host_ips.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "streaming_core_nodes.0.host_ips.#", "3"),
 					resource.TestCheckResourceAttr(resourceName, "analysis_task_nodes.0.host_ips.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "streaming_task_nodes.0.host_ips.#", "1"),
 				),
 			},
 			{
@@ -422,6 +432,7 @@ func TestAccMrsMapReduceCluster_custom_fullsize(t *testing.T) {
 	})
 }
 
+// TODO external datasource connect is unsupported currently.
 func TestAccMrsMapReduceCluster_externalDataSources(t *testing.T) {
 	var clusterGet cluster.Cluster
 	resourceName := "hcso_mapreduce_cluster.test"
@@ -441,7 +452,7 @@ func TestAccMrsMapReduceCluster_externalDataSources(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckMRSV2ClusterExists(resourceName, &clusterGet),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "type", "ANALYSIS"),
+					resource.TestCheckResourceAttr(resourceName, "type", "CUSTOM"),
 					resource.TestCheckResourceAttr(resourceName, "status", "running"),
 				),
 			},
@@ -453,6 +464,7 @@ func TestAccMrsMapReduceCluster_externalDataSources(t *testing.T) {
 					"manager_admin_pass",
 					"node_admin_pass",
 					"external_datasources",
+					"template_id",
 				},
 			},
 		},
@@ -548,40 +560,40 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "STREAMING"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  component_list     = ["Storm"]
+  component_list     = ["Ranger"]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
-  streaming_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 1
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
-    data_volume_count = 1
-  }
+  //streaming_task_nodes {
+  //  flavor            = "kc1.2xlarge.4.linux.bigdata"
+  //  node_number       = 1
+  //  root_volume_type  = "SSD"
+  //  root_volume_size  = 480
+  //  data_volume_type  = "SSD"
+  //  data_volume_size  = 600
+  //  data_volume_count = 1
+  //}
 
   tags = {
     foo = "bar"
@@ -598,40 +610,40 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "STREAMING"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  component_list     = ["Storm"]
+  component_list     = ["Ranger","DBervice"]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
-  streaming_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 1
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
-    data_volume_count = 1
-  }
+  //streaming_task_nodes {
+  //  flavor            = "kc1.2xlarge.4.linux.bigdata"
+  //  node_number       = 1
+  //  root_volume_type  = "SSD"
+  //  root_volume_size  = 480
+  //  data_volume_type  = "SSD"
+  //  data_volume_size  = 600
+  //  data_volume_count = 1
+  //}
 
   tags = {
     foo1 = "bar"
@@ -658,35 +670,35 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "STREAMING"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_key_pair      = hcso_compute_keypair.test.name
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  component_list     = ["Storm"]
+  component_list     = ["Ranger"]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
 }`, testAccMrsMapReduceClusterConfig_base(rName), rName, rName, pwd)
 }
 
-func testAccMrsMapReduceClusterConfig_analysis(rName, pwd string, nodeNums GroupNodeNum) string {
+func testAccMrsMapReduceClusterConfig_analysis(rName, pwd, components string, nodeNums GroupNodeNum) string {
 	return fmt.Sprintf(`
 %s
 
@@ -694,45 +706,45 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "ANALYSIS"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  component_list     = ["Hadoop", "Hive", "Tez"]
+  component_list     = [%s]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
     root_volume_size  = 600
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
   }
   analysis_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 600
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
   }
   analysis_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 600
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
   }
-}`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd,
+}`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd, components,
 		nodeNums.AnalysisCoreNum, nodeNums.AnalysisTaskNum)
 }
 
-func testAccMrsMapReduceClusterConfig_stream(rName, pwd string, nodeNums GroupNodeNum) string {
+func testAccMrsMapReduceClusterConfig_stream(rName, pwd, components string, nodeNums GroupNodeNum) string {
 	return fmt.Sprintf(`
 %s
 
@@ -740,45 +752,46 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "STREAMING"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  component_list     = ["Storm"]
+  component_list     = [%s]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
-  streaming_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = %d
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
-    data_volume_count = 1
-  }
-}`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd,
+  // streaming_task_nodes is only supported when the component list contains "Storm" but "Storm" is not in the variable component list
+  //streaming_task_nodes {
+  //  flavor            = "kc1.2xlarge.4.linux.bigdata"
+  //  node_number       = %d
+  //  root_volume_type  = "SSD"
+  //  root_volume_size  = 480
+  //  data_volume_type  = "SSD"
+  //  data_volume_size  = 600
+  //  data_volume_count = 1
+  //}
+}`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd, components,
 		nodeNums.StreamCoreNum, nodeNums.StreamTaskNum)
 }
 
-func testAccMrsMapReduceClusterConfig_hybrid(rName, pwd string, nodeNums GroupNodeNum) string {
+func testAccMrsMapReduceClusterConfig_hybrid(rName, pwd, components string, nodeNums GroupNodeNum) string {
 	return fmt.Sprintf(`
 %s
 
@@ -786,61 +799,52 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "MIXED"
-  version            = "MRS 3.1.5"
+  version            = "MRS 3.3.0-LTS"
   safe_mode          = true
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  component_list     = ["Hadoop", "Spark", "Hive", "Tez", "Storm"]
+  component_list     = [%s]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   analysis_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   analysis_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
-  streaming_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = %d
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
-    data_volume_count = 1
-  }
-}`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd,
-		nodeNums.AnalysisCoreNum, nodeNums.StreamCoreNum, nodeNums.AnalysisTaskNum, nodeNums.StreamTaskNum)
+}`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd, components,
+		nodeNums.AnalysisCoreNum, nodeNums.StreamCoreNum, nodeNums.AnalysisTaskNum)
 }
 
 func testAccMrsMapReduceClusterConfig_customCompact(rName, pwd string, nodeNum1 int) string {
@@ -851,21 +855,21 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "CUSTOM"
-  version            = "MRS 3.1.0"
+  version            = "MRS 3.3.0-LTS"
   safe_mode          = true
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  template_id        = "mgmt_control_combined_v4"
-  component_list     = ["DBService", "Hadoop", "ZooKeeper", "Ranger", "ClickHouse"]
+  template_id        = "mgmt_control_combined_v4.1"
+  component_list     = ["Hadoop", "ZooKeeper", "Ranger"]
 
-master_nodes {
-    flavor            = "c6.4xlarge.4.linux.bigdata"
+  master_nodes {
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = 3
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
@@ -887,18 +891,17 @@ master_nodes {
       "TagSync:2",
       "KerberosClient",
       "SlapdClient",
-      "meta",
-      "ClickHouseBalancer:1,2"
+      "meta"
     ]
   }
 
   custom_nodes {
     group_name        = "node_group_1"
-    flavor            = "c6.4xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
@@ -911,22 +914,21 @@ master_nodes {
   }
 
   custom_nodes {
-    group_name        = "ClickHouse"
-    flavor            = "c6.4xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
+    group_name        = "node_group_2"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
-      "ClickHouseServer",
-      "meta",
+      "NodeManager",
       "KerberosClient",
-      "SlapdClient"
+      "SlapdClient",
+      "meta"
     ]
   }
-  
 }`, testAccMrsMapReduceClusterConfig_base(rName), rName, pwd, pwd, nodeNum1)
 }
 
@@ -956,7 +958,7 @@ resource "hcso_rds_instance" "test" {
   fixed_ip          = "192.168.0.58"
 
   db {
-    password = "Huangwei!120521"
+    password = "%[3]s"
     type     = "MySQL"
     version  = "5.7"
     port     = 3306
@@ -973,46 +975,114 @@ resource "hcso_rds_mysql_database" "test" {
   character_set = "utf8"
 }
 
+resource "hcso_rds_mysql_account" "test" {
+  instance_id = hcso_rds_instance.test.id
+  name        = "%[2]s"
+  password    = "%[3]s"
+}
+
+resource "hcso_rds_mysql_database_privilege" "test" {
+  instance_id = hcso_rds_instance.test.id
+  db_name     = hcso_rds_mysql_database.test.name
+
+  users {
+    name = hcso_rds_mysql_account.test.name
+  }
+}
+
 resource "hcso_mapreduce_data_connection" "test" {
   name        = "%[2]s"
   source_type = "RDS_MYSQL"
   source_info {
     db_instance_id = hcso_rds_instance.test.id
     db_name        = hcso_rds_mysql_database.test.name
-    user_name      = "root"
+    user_name      = hcso_rds_mysql_account.test.name
     password       = "%[3]s"
   }
 }
 
+
 resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%[2]s"
-  type               = "ANALYSIS"
-  version            = "MRS 1.9.2"
-  safe_mode          = false
+  type               = "CUSTOM"
+  version            = "MRS 3.3.0-LTS"
+  safe_mode          = true
   manager_admin_pass = "%[3]s"
   node_admin_pass    = "%[3]s"
-  vpc_id             = hcso_vpc.test.id
   subnet_id          = hcso_vpc_subnet.test.id
-  component_list     = ["Hadoop", "Hive", "Tez"]
+  vpc_id             = hcso_vpc.test.id
+  template_id        = "mgmt_control_combined_v4.1"
+  component_list     = ["Hadoop", "ZooKeeper", "Ranger", "Hive"]
 
   master_nodes {
-    flavor            = "c6.4xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 600
-    data_volume_type  = "SAS"
-    data_volume_size  = 600
-    data_volume_count = 1
-  }
-  analysis_core_nodes {
-    flavor            = "c6.4xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = 3
-    root_volume_type  = "SAS"
-    root_volume_size  = 600
-    data_volume_type  = "SAS"
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
+    assigned_roles = [
+      "OMSServer:1,2",
+      "SlapdServer:1,2",
+      "KerberosServer:1,2",
+      "KerberosAdmin:1,2",
+      "quorumpeer:1,2,3",
+      "NameNode:2,3",
+      "Zkfc:2,3",
+      "JournalNode:1,2,3",
+      "ResourceManager:2,3",
+      "JobHistoryServer:2,3",
+      "DBServer:1,3",
+      "HttpFS:1,3",
+      "MetaStore:1,2",
+      "WebHCat:3",
+      "HiveServer:1,2",
+      "TimelineServer:3",
+      "RangerAdmin:1,2",
+      "UserSync:2",
+      "TagSync:2",
+      "KerberosClient",
+      "SlapdClient",
+      "meta"
+    ]
+  }
+
+  custom_nodes {
+    group_name        = "node_group_1"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
+    data_volume_count = 1
+    assigned_roles = [
+      "DataNode",
+      "NodeManager",
+      "KerberosClient",
+      "SlapdClient",
+      "meta"
+    ]
+  }
+
+  custom_nodes {
+    group_name        = "node_group_2"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
+    data_volume_count = 1
+    assigned_roles = [
+      "DataNode",
+      "NodeManager",
+      "KerberosClient",
+      "SlapdClient",
+      "meta"
+    ]
   }
 
   external_datasources {
@@ -1032,7 +1102,7 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "CUSTOM"
-  version            = "MRS 3.1.0"
+  version            = "MRS 3.3.0-LTS"
   safe_mode          = true
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
@@ -1041,12 +1111,12 @@ resource "hcso_mapreduce_cluster" "test" {
   template_id        = "mgmt_control_separated_v4"
   component_list     = ["DBService", "Hadoop", "ZooKeeper", "Ranger"]
 
-master_nodes {
+  master_nodes {
     flavor            = "c6.4xlarge.4.linux.bigdata"
     node_number       = 5
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
@@ -1076,9 +1146,9 @@ master_nodes {
     group_name        = "node_group_1"
     flavor            = "c6.4xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
@@ -1101,21 +1171,21 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "CUSTOM"
-  version            = "MRS 3.1.0"
+  version            = "MRS 3.3.0-LTS"
   safe_mode          = true
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
-  template_id        = "mgmt_control_data_separated_v4"
-  component_list     = ["Hadoop", "Ranger", "ZooKeeper","DBServer"]
+  template_id        = "mgmt_control_data_separated_v4.1"
+  component_list     = ["Hadoop", "Ranger", "ZooKeeper"]
 
   master_nodes {
-    flavor            = "c6.4xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = 9
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
@@ -1128,7 +1198,7 @@ resource "hcso_mapreduce_cluster" "test" {
       "Zkfc:3,4",
       "JournalNode:5,6,7",
       "ResourceManager:8,9",
-      "JobHistoryServer:8",
+      "JobHistoryServer:8,9",
       "DBServer:8,9",
       "HttpFS:8,9",
       "TimelineServer:5",
@@ -1143,11 +1213,11 @@ resource "hcso_mapreduce_cluster" "test" {
 
   custom_nodes {
     group_name        = "node_group_1"
-    flavor            = "c6.4xlarge.4.linux.bigdata"
+    flavor            = "ac7.4xlarge.4.linux.bigdata"
     node_number       = %d
-    root_volume_type  = "SAS"
+    root_volume_type  = "SSD"
     root_volume_size  = 480
-    data_volume_type  = "SAS"
+    data_volume_type  = "SSD"
     data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
@@ -1223,41 +1293,42 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "STREAMING"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
   eip_id             = hcso_vpc_eip.test.id
-  component_list     = ["Storm"]
+  component_list     = ["Ranger"]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
-  streaming_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 1
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
-    data_volume_count = 1
-  }
+  // streaming_task_nodes is only supported when the component list contains "Storm" but "Storm" is not in the variable component list
+  //streaming_task_nodes {
+  //  flavor            = "kc1.2xlarge.4.linux.bigdata"
+  //  node_number       = 1
+  //  root_volume_type  = "SSD"
+  //  root_volume_size  = 480
+  //  data_volume_type  = "SSD"
+  //  data_volume_size  = 600
+  //  data_volume_count = 1
+  //}
 
   tags = {
     foo = "bar"
@@ -1327,41 +1398,43 @@ resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%s"
   type               = "STREAMING"
-  version            = "MRS 1.9.2"
+  version            = "MRS 3.3.0-LTS"
   manager_admin_pass = "%s"
   node_admin_pass    = "%s"
   subnet_id          = hcso_vpc_subnet.test.id
   vpc_id             = hcso_vpc.test.id
   public_ip          = hcso_vpc_eip.test.address
-  component_list     = ["Storm"]
+  component_list     = ["Ranger"]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
   streaming_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
+    flavor            = "kc1.2xlarge.4.linux.bigdata"
+    node_number       = 3
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
   }
-  streaming_task_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 1
-    root_volume_type  = "SAS"
-    root_volume_size  = 300
-    data_volume_type  = "SAS"
-    data_volume_size  = 480
-    data_volume_count = 1
-  }
+
+  // streaming_task_nodes is only supported when the component list contains "Storm" but "Storm" is not in the variable component list
+  //streaming_task_nodes {
+  //  flavor            = "kc1.2xlarge.4.linux.bigdata"
+  //  node_number       = 1
+  //  root_volume_type  = "SSD"
+  //  root_volume_size  = 480
+  //  data_volume_type  = "SSD"
+  //  data_volume_size  = 600
+  //  data_volume_count = 1
+  //}
 
   tags = {
     foo = "bar"
@@ -1424,7 +1497,7 @@ func testAccMrsMapReduceClusterConfig_bootstrap(rName, pwd string) string {
 resource "hcso_mapreduce_cluster" "test" {
   availability_zone  = data.hcso_availability_zones.test.names[0]
   name               = "%[2]s"
-  version            = "MRS 3.1.5"
+  version            = "MRS 3.3.0-LTS"
   type               = "CUSTOM"
   safe_mode          = false
   manager_admin_pass = "%[3]s"
@@ -1437,10 +1510,10 @@ resource "hcso_mapreduce_cluster" "test" {
   master_nodes {
     flavor            = "c6.4xlarge.4.linux.bigdata"
     node_number       = 3
-    root_volume_type  = "SAS"
-    root_volume_size  = 100
-    data_volume_type  = "SAS"
-    data_volume_size  = 200
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
       "OMSServer:1,2",
@@ -1469,10 +1542,10 @@ resource "hcso_mapreduce_cluster" "test" {
     group_name        = "node_group_1"
     flavor            = "c6.4xlarge.4.linux.bigdata"
     node_number       = 3
-    root_volume_type  = "SAS"
-    root_volume_size  = 100
-    data_volume_type  = "SAS"
-    data_volume_size  = 200
+    root_volume_type  = "SSD"
+    root_volume_size  = 480
+    data_volume_type  = "SSD"
+    data_volume_size  = 600
     data_volume_count = 1
     assigned_roles = [
       "DataNode",
