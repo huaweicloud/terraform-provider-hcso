@@ -11,29 +11,49 @@ Attaches a volume to an ECS Instance.
 ### Basic attachment of a single volume to a single instance
 
 ```hcl
-variable "security_group_id" {}
+variable "secgroup_id" {}
 
-resource "hcso_evs_volume" "myvol" {
-  name              = "volume"
-  availability_zone = "cn-north-4a"
-  volume_type       = "SAS"
-  size              = 10
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
 }
 
 resource "hcso_compute_instance" "myinstance" {
-  name               = "instance"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
-  security_group_ids = [var.security_group_id]
-  availability_zone  = "cn-north-4a"
-
-  system_disk_type = "SSD"
-  system_disk_size = 40
+  name               = "myinstance"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
+  security_group_ids = [var.secgroup_id]
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
+}
+
+resource "hcso_evs_volume" "myvol" {
+  name              = "volume"
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  volume_type       = "SSD"
+  size              = 10
 }
 
 resource "hcso_compute_volume_attach" "attached" {
@@ -45,27 +65,50 @@ resource "hcso_compute_volume_attach" "attached" {
 ### Attaching multiple volumes to a single instance
 
 ```hcl
-variable "security_group_id" {}
+variable "secgroup_id" {}
 
-resource "hcso_evs_volume" "myvol" {
-  count             = 2
-  name              = "volume_1"
-  availability_zone = "cn-north-4a"
-  volume_type       = "SAS"
-  size              = 10
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
 }
 
 resource "hcso_compute_instance" "myinstance" {
-  name               = "instance"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
-  security_group_ids = [var.security_group_id]
-  availability_zone  = "cn-north-4a"
-  
-  system_disk_type = "SSD"
-  system_disk_size = 40
+  name               = "myinstance"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
+  security_group_ids = [var.secgroup_id]
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
+  network {
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
+  }
+}
+
+resource "hcso_evs_volume" "myvol" {
+  count             = 2
+  name              = "volume"
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  volume_type       = "SSD"
+  size              = 10
 }
 
 resource "hcso_compute_volume_attach" "attachments" {
@@ -74,7 +117,7 @@ resource "hcso_compute_volume_attach" "attachments" {
   volume_id   = element(hcso_evs_volume.myvol[*].id, count.index)
 }
 
-output "volume devices" {
+output "volume_devices" {
   value = hcso_compute_volume_attach.attachments[*].device
 }
 ```
