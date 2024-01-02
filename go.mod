@@ -4,13 +4,13 @@ go 1.18
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20200316065508-bb7000b8a962
-	github.com/chnsz/golangsdk v0.0.0-20231116092734-aea085e96032
+	github.com/chnsz/golangsdk v0.0.0-20231207092945-17836db4283b
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.0
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.62
-	github.com/huaweicloud/terraform-provider-huaweicloud v1.57.1-0.20231121033342-4d13c4cd32ee
+	github.com/huaweicloud/terraform-provider-huaweicloud v1.58.1-0.20231211091301-77a59687049b
 	github.com/jen20/awspolicyequivalence v1.1.0
 	github.com/jmespath/go-jmespath v0.4.0
 	github.com/keybase/go-crypto v0.0.0-20200123153347-de78d2cb44f4
