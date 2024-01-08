@@ -16,6 +16,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dws"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/eip"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
@@ -310,7 +311,8 @@ func Provider() *schema.Provider {
 			"hcso_cce_node_pool":      cce.DataSourceCCENodePoolV3(),
 			"hcso_cce_nodes":          cce.DataSourceNodes(),
 
-			"hcso_dns_zones": dns.DataSourceZones(),
+			"hcso_dns_zones":   dns.DataSourceZones(),
+			"hcso_dws_flavors": dws.DataSourceDwsFlavors(),
 
 			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
 
@@ -348,6 +350,9 @@ func Provider() *schema.Provider {
 			"hcso_compute_keypair":          huaweicloud.ResourceComputeKeypairV2(),
 			"hcso_compute_eip_associate":    ecs.ResourceComputeEIPAssociate(),
 			"hcso_compute_volume_attach":    ecs.ResourceComputeVolumeAttach(),
+
+			"hcso_dws_event_subscription": dws.ResourceDwsEventSubs(),
+			"hcso_dws_alarm_subscription": dws.ResourceDwsAlarmSubs(),
 
 			"hcso_evs_volume": evs.ResourceEvsVolume(),
 
