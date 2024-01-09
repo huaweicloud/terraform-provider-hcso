@@ -13,6 +13,7 @@ import (
 
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/as"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
@@ -22,6 +23,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/smn"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
@@ -296,6 +298,10 @@ func Provider() *schema.Provider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
+
+			"hcso_as_configurations": as.DataSourceASConfigurations(),
+			"hcso_as_groups":         as.DataSourceASGroups(),
+
 			"hcso_availability_zones": huaweicloud.DataSourceAvailabilityZones(),
 
 			"hcso_compute_flavors":      ecs.DataSourceEcsFlavors(),
@@ -334,6 +340,14 @@ func Provider() *schema.Provider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
+
+			"hcso_as_configuration":   as.ResourceASConfiguration(),
+			"hcso_as_group":           as.ResourceASGroup(),
+			"hcso_as_instance_attach": as.ResourceASInstanceAttach(),
+			"hcso_as_lifecycle_hook":  as.ResourceASLifecycleHook(),
+			"hcso_as_notification":    as.ResourceAsNotification(),
+			"hcso_as_policy":          as.ResourceASPolicy(),
+
 			"hcso_cbr_vault": cbr.ResourceVault(),
 
 			"hcso_cce_cluster":     cce.ResourceCluster(),
@@ -368,6 +382,8 @@ func Provider() *schema.Provider {
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+
+			"hcso_smn_topic": smn.ResourceTopic(),
 
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),

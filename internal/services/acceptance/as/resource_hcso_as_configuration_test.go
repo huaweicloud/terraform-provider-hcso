@@ -134,22 +134,21 @@ func testAccASConfiguration_base(rName string) string {
 data "hcso_availability_zones" "test" {}
 
 data "hcso_images_image" "test" {
-  name        = "Ubuntu 18.04 server 64bit"
+  name        = "Ubuntu 18.04 server 64bit with ARM"
   most_recent = true
 }
 
 data "hcso_compute_flavors" "test" {
   availability_zone = data.hcso_availability_zones.test.names[0]
-  performance_type  = "normal"
   cpu_core_count    = 2
   memory_size       = 4
 }
 
-data "hcso_vpc_subnet" "test" {
+data "hcso_vpc_subnets" "test" {
   name = "subnet-default"
 }
 
-data "hcso_networking_secgroup" "test" {
+data "hcso_networking_secgroups" "test" {
   name = "default"
 }
 
@@ -170,7 +169,7 @@ resource "hcso_as_configuration" "acc_as_config"{
     image              = data.hcso_images_image.test.id
     flavor             = data.hcso_compute_flavors.test.ids[0]
     key_name           = hcso_compute_keypair.acc_key.id
-    security_group_ids = [data.hcso_networking_secgroup.test.id]
+    security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
 
     metadata = {
       some_key = "some_value"
@@ -209,10 +208,11 @@ resource "hcso_compute_instance" "test" {
   name               = "%s"
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
-  security_group_ids = [data.hcso_networking_secgroup.test.id]
+  security_group_ids = [data.hcso_networking_secgroups.test.security_groups[0].id]
+  system_disk_type = "SSD"
 
   network {
-    uuid = data.hcso_vpc_subnet.test.id
+    uuid = data.hcso_vpc_subnets.test.subnets[0].id
   }
 }
 
