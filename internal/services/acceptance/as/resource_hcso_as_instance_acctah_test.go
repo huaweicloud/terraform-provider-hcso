@@ -107,6 +107,7 @@ resource "hcso_compute_instance" "test" {
   image_id           = data.hcso_images_image.test.id
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
   security_group_ids = [hcso_networking_secgroup.test.id]
+  system_disk_type   = "SSD"
 
   network {
     uuid = hcso_vpc_subnet.test.id
