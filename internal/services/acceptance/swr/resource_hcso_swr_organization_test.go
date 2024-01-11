@@ -17,7 +17,7 @@ import (
 func getResourceOrganization(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {
 	swrClient, err := conf.SwrV2Client(acceptance.HCSO_REGION_NAME)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating HuaweiCloud SWR client: %s", err)
+		return nil, fmt.Errorf("Error creating HCSO SWR client: %s", err)
 	}
 
 	return namespaces.Get(swrClient, state.Primary.ID).Extract()
@@ -27,7 +27,7 @@ func TestAccSWROrganization_basic(t *testing.T) {
 	var org namespaces.Namespace
 	rName := acceptance.RandomAccResourceName()
 	resourceName := "hcso_swr_organization.test"
-	loginServer := fmt.Sprintf("swr.%s.myhuaweicloud.com", acceptance.HCSO_REGION_NAME)
+	loginServer := fmt.Sprintf("swr.%s.rm.ga.com", acceptance.HCSO_REGION_NAME)
 
 	rc := acceptance.InitResourceCheck(
 		resourceName,
