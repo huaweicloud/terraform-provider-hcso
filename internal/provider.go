@@ -320,6 +320,8 @@ func Provider() *schema.Provider {
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
 
+			"hcso_nat_gateway": nat.DataSourcePublicGateway(),
+
 			"hcso_vpc":                    vpc.DataSourceVpcV1(),
 			"hcso_vpcs":                   vpc.DataSourceVpcs(),
 			"hcso_vpc_subnet_ids":         vpc.DataSourceVpcSubnetIdsV1(),
@@ -365,9 +367,13 @@ func Provider() *schema.Provider {
 			"hcso_lb_pool":         lb.ResourcePoolV2(),
 			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
 
+			"hcso_nat_gateway":            nat.ResourcePublicGateway(),
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+			"hcso_nat_private_dnat_rule":  nat.ResourcePrivateDnatRule(),
+			"hcso_nat_snat_rule":          nat.ResourcePublicSnatRule(),
+			"hcso_nat_dnat_rule":          nat.ResourcePublicDnatRule(),
 
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
