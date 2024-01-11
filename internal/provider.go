@@ -22,6 +22,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/swr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
@@ -383,6 +384,10 @@ func Provider() *schema.Provider {
 			"hcso_vpc_eip":                  eip.ResourceVpcEIPV1(),
 			"hcso_vpc_eip_associate":        eip.ResourceEIPAssociate(),
 			"hcso_networking_eip_associate": eip.ResourceEIPAssociate(),
+
+			"hcso_swr_organization":           swr.ResourceSWROrganization(),
+			"hcso_swr_repository":             swr.ResourceSWRRepository(),
+			"hcso_swr_image_retention_policy": swr.ResourceSwrImageRetentionPolicy(),
 
 			"hcso_tms_tags": tms.ResourceTmsTag(),
 		},
