@@ -15,6 +15,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dcs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/eip"
@@ -309,6 +310,8 @@ func Provider() *schema.Provider {
 			"hcso_cce_node":           cce.DataSourceNode(),
 			"hcso_cce_node_pool":      cce.DataSourceCCENodePoolV3(),
 			"hcso_cce_nodes":          cce.DataSourceNodes(),
+
+			"hcso_dcs_maintainwindow": dcs.DataSourceDcsMaintainWindow(),
 
 			"hcso_dns_zones": dns.DataSourceZones(),
 
