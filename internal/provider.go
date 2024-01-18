@@ -22,6 +22,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
@@ -325,6 +326,8 @@ func Provider() *schema.Provider {
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
 
+			"hcso_rds_engine_versions": rds.DataSourceRdsEngineVersionsV3(),
+
 			"hcso_sfs_turbos": sfs.DataSourceTurbos(),
 
 			"hcso_vpc":                    vpc.DataSourceVpcV1(),
@@ -379,6 +382,8 @@ func Provider() *schema.Provider {
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+
+			"hcso_rds_parametergroup": rds.ResourceRdsConfiguration(),
 
 			"hcso_sfs_turbo": sfs.ResourceSFSTurbo(),
 
