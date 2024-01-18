@@ -11,7 +11,7 @@ Manages a keypair resource within Huawei Cloud Stack Online.
 ### Create a new keypair and export private key to current folder
 
 ```hcl
-resource "hcso_compute_keypair" "test-keypair" {
+resource "hcso_compute_keypair" "my-keypair" {
   name     = "my-keypair"
   key_file = "private_key.pem"
 }
@@ -21,7 +21,7 @@ resource "hcso_compute_keypair" "test-keypair" {
 
 ```hcl
 resource "hcso_compute_keypair" "test-keypair" {
-  name       = "my-keypair"
+  name       = "test-keypair"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAlJq5Pu+eizhou7nFFDxXofr2ySF8k/yuA9OnJdVF9Fbf85Z59CWNZBvcAT... root@terra-dev"
 }
 ```

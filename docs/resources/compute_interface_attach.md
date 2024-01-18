@@ -23,8 +23,8 @@ resource "hcso_compute_interface_attach" "test" {
 ### Attach a port (under the specified network) to the ECS instance and use the custom security groups
 
 ```hcl
-variable "instance_id" {
-variable "network_id" {
+variable "instance_id" {}
+variable "network_id" {}
 variable "security_group_ids" {
   type = list(string)
 }
@@ -40,10 +40,27 @@ resource "hcso_compute_interface_attach" "test" {
 ### Attach a custom port to the ECS instance
 
 ```hcl
-variable "security_group_id" {}
+variable "secgroup_id" {}
+
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
 
 data "hcso_vpc_subnets" "mynet" {
   name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
 }
 
 data "hcso_networking_port" "myport" {
@@ -52,18 +69,17 @@ data "hcso_networking_port" "myport" {
 }
 
 resource "hcso_compute_instance" "myinstance" {
-  name               = "instance"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
-  security_group_ids = [var.security_group_id]
-  availability_zone  = "cn-north-4a"
-  
-  system_disk_type = "SSD"
-  system_disk_size = 40
-  
+  name               = "myinstance"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
+  security_group_ids = [var.secgroup_id]
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
+
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
 }
 
