@@ -132,9 +132,6 @@ The following arguments are supported:
   -> This parameter is only valid for pay-as-you-go resources, and the snapshots bound to the package period resources
      will be removed while resources unsubscribed.
 
-* `auto_renew` - (Optional, String) Specifies whether auto-renew is enabled.
-  Valid values are **true** and **false**.
-
 ## Attribute Reference
 
 In addition to all arguments above, the following attributes are exported:
