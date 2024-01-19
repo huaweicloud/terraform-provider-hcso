@@ -595,6 +595,23 @@ resource "hcso_rds_instance" "test" {
 `, common.TestBaseNetwork(name), name, password)
 }
 
+func testAccRdsInstance_base() string {
+	return `
+data "hcso_availability_zones" "test" {}
+
+data "hcso_vpc" "test" {
+  name = "vpc-default"
+}
+
+data "hcso_vpc_subnet" "test" {
+  name = "subnet-default"
+}
+
+data "hcso_networking_secgroup" "test" {
+  name = "default"
+}`
+}
+
 // name, volume.size, backup_strategy, flavor, tags and password will be updated
 func testAccRdsInstance_update(name, password string) string {
 	return fmt.Sprintf(`
@@ -985,6 +1002,56 @@ resource "hcso_rds_instance" "test" {
   }
 }
 `, name, fixedIp, pwd)
+}
+
+func testAccRdsInstance_sqlserverWithoutFixedIp(name, pwd string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+data "hcso_availability_zones" "test" {}
+
+resource "hcso_networking_secgroup_rule" "ingress" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  ports             = 8635
+  protocol          = "tcp"
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = hcso_networking_secgroup.test.id
+}
+
+data "hcso_rds_flavors" "test" {
+  db_type       = "SQLServer"
+  db_version    = "2017_EE"
+  instance_mode = "single"
+  group_type    = "dedicated"
+  vcpus         = 4
+}
+
+resource "hcso_rds_instance" "test" {
+  name              = "%[2]s"
+  flavor            = data.hcso_rds_flavors.test.flavors[0].name
+  security_group_id = hcso_networking_secgroup.test.id
+  subnet_id         = hcso_vpc_subnet.test.id
+  vpc_id            = hcso_vpc.test.id
+  collation         = "Chinese_PRC_CI_AS"
+
+  availability_zone = [
+    data.hcso_availability_zones.test.names[0],
+  ]
+
+  db {
+    password = "%[3]s"
+    type     = "SQLServer"
+    version  = "2017_EE"
+    port     = 8635
+  }
+
+  volume {
+    type = "CLOUDSSD"
+    size = 40
+  }
+}
+`, common.TestBaseNetwork(name), name, pwd)
 }
 
 func testAccRdsInstance_prePaid(name, pwd string, isAutoRenew bool) string {
