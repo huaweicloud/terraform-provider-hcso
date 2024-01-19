@@ -6,12 +6,12 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/acceptance"
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/acceptance/common"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance/common"
 )
 
 func TestAccDatasourceLoadBalancers_basic(t *testing.T) {
-	rName := "data.huaweicloud_elb_loadbalancers.test"
+	rName := "data.hcso_elb_loadbalancers.test"
 	dc := acceptance.InitDataSourceCheck(rName)
 	name := acceptance.RandomAccResourceName()
 
@@ -50,36 +50,36 @@ func testAccDatasourceLoadBalancers_base(rName string) string {
 	return fmt.Sprintf(`
 %[1]s
 
-data "huaweicloud_availability_zones" "test" {}
+data "hcso_availability_zones" "test" {}
 
-data "huaweicloud_elb_flavors" "l4flavors" {
+data "hcso_elb_flavors" "l4flavors" {
   type            = "L4"
   max_connections = 1000000
   cps             = 20000
   bandwidth       = 100
 }
 
-data "huaweicloud_elb_flavors" "l7flavors" {
+data "hcso_elb_flavors" "l7flavors" {
   type            = "L7"
   max_connections = 400000
   cps             = 4000
   bandwidth       = 100
 }
 
-resource "huaweicloud_elb_loadbalancer" "test" {
+resource "hcso_elb_loadbalancer" "test" {
   name           = "%[2]s"
-  vpc_id         = huaweicloud_vpc.test.id
-  ipv4_subnet_id = huaweicloud_vpc_subnet.test.ipv4_subnet_id
+  vpc_id         = hcso_vpc.test.id
+  ipv4_subnet_id = hcso_vpc_subnet.test.ipv4_subnet_id
   description    = "update flavors"
-  l4_flavor_id   = data.huaweicloud_elb_flavors.l4flavors.ids[0]
-  l7_flavor_id   = data.huaweicloud_elb_flavors.l7flavors.ids[0]
+  l4_flavor_id   = data.hcso_elb_flavors.l4flavors.ids[0]
+  l7_flavor_id   = data.hcso_elb_flavors.l7flavors.ids[0]
   
   availability_zone = [
-    data.huaweicloud_availability_zones.test.names[0]
+    data.hcso_availability_zones.test.names[0]
   ]
 
   backend_subnets = [
-    huaweicloud_vpc_subnet.test.id
+    hcso_vpc_subnet.test.id
   ]
 
   tags = {
@@ -94,115 +94,115 @@ func testAccDatasourceLoadBalancers_basic(name string) string {
 	return fmt.Sprintf(`
 %[1]s
 
-data "huaweicloud_elb_loadbalancers" "test" {
-  depends_on = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "test" {
+  depends_on = [hcso_elb_loadbalancer.test]
 }
 
-data "huaweicloud_elb_loadbalancers" "name_filter" {
+data "hcso_elb_loadbalancers" "name_filter" {
   name       = "%[2]s"
-  depends_on = [huaweicloud_elb_loadbalancer.test]
+  depends_on = [hcso_elb_loadbalancer.test]
 }
 
 output "name_filter_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.name_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.name_filter.loadbalancers[*].name :v == "%[2]s"]
+  value = length(data.hcso_elb_loadbalancers.name_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.name_filter.loadbalancers[*].name :v == "%[2]s"]
   )  
 }
 
-data "huaweicloud_elb_loadbalancers" "vpc_id_filter" {
-  vpc_id     = huaweicloud_elb_loadbalancer.test.vpc_id
-  depends_on = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "vpc_id_filter" {
+  vpc_id     = hcso_elb_loadbalancer.test.vpc_id
+  depends_on = [hcso_elb_loadbalancer.test]
 }
 locals {
-  vpc_id = huaweicloud_elb_loadbalancer.test.vpc_id
+  vpc_id = hcso_elb_loadbalancer.test.vpc_id
 }
 output "vpc_id_filter_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.vpc_id_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.vpc_id_filter.loadbalancers[*].vpc_id : v == local.vpc_id]
+  value = length(data.hcso_elb_loadbalancers.vpc_id_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.vpc_id_filter.loadbalancers[*].vpc_id : v == local.vpc_id]
   )  
 }
 
-data "huaweicloud_elb_loadbalancers" "ipv4_subnet_id_filter" {
-  ipv4_subnet_id = huaweicloud_elb_loadbalancer.test.ipv4_subnet_id
-  depends_on     = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "ipv4_subnet_id_filter" {
+  ipv4_subnet_id = hcso_elb_loadbalancer.test.ipv4_subnet_id
+  depends_on     = [hcso_elb_loadbalancer.test]
 }
 locals {
-  ipv4_subnet_id = huaweicloud_elb_loadbalancer.test.ipv4_subnet_id
+  ipv4_subnet_id = hcso_elb_loadbalancer.test.ipv4_subnet_id
 }
 output "ipv4_subnet_id_filter_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.vpc_id_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.ipv4_subnet_id_filter.loadbalancers[*].ipv4_subnet_id : 
+  value = length(data.hcso_elb_loadbalancers.vpc_id_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.ipv4_subnet_id_filter.loadbalancers[*].ipv4_subnet_id : 
   v == local.ipv4_subnet_id]
   )  
 }
 
-data "huaweicloud_elb_loadbalancers" "description_filter" {
-  description = huaweicloud_elb_loadbalancer.test.description
-  depends_on  = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "description_filter" {
+  description = hcso_elb_loadbalancer.test.description
+  depends_on  = [hcso_elb_loadbalancer.test]
 }
 locals {
-  description = huaweicloud_elb_loadbalancer.test.description
+  description = hcso_elb_loadbalancer.test.description
 }
 output "description_filter_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.description_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.description_filter.loadbalancers[*].description : 
+  value = length(data.hcso_elb_loadbalancers.description_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.description_filter.loadbalancers[*].description : 
   v == local.description]
   )  
 }
 
 
-data "huaweicloud_elb_loadbalancers" "l4_flavor_id_filter" {
-  l4_flavor_id = huaweicloud_elb_loadbalancer.test.l4_flavor_id
-  depends_on   = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "l4_flavor_id_filter" {
+  l4_flavor_id = hcso_elb_loadbalancer.test.l4_flavor_id
+  depends_on   = [hcso_elb_loadbalancer.test]
 }
 locals {
-  l4_flavor_id = huaweicloud_elb_loadbalancer.test.l4_flavor_id
+  l4_flavor_id = hcso_elb_loadbalancer.test.l4_flavor_id
 }
 output "l4_flavor_id_filter_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.l4_flavor_id_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.l4_flavor_id_filter.loadbalancers[*].l4_flavor_id : 
+  value = length(data.hcso_elb_loadbalancers.l4_flavor_id_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.l4_flavor_id_filter.loadbalancers[*].l4_flavor_id : 
   v == local.l4_flavor_id]
   )  
 }
 
-data "huaweicloud_elb_loadbalancers" "l7_flavor_id_filter" {
-  l7_flavor_id = huaweicloud_elb_loadbalancer.test.l7_flavor_id
-  depends_on   = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "l7_flavor_id_filter" {
+  l7_flavor_id = hcso_elb_loadbalancer.test.l7_flavor_id
+  depends_on   = [hcso_elb_loadbalancer.test]
 }
 locals {
-  l7_flavor_id = huaweicloud_elb_loadbalancer.test.l7_flavor_id
+  l7_flavor_id = hcso_elb_loadbalancer.test.l7_flavor_id
 }
 output "l7_flavor_id_filter_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.l7_flavor_id_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.l7_flavor_id_filter.loadbalancers[*].l7_flavor_id : 
+  value = length(data.hcso_elb_loadbalancers.l7_flavor_id_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.l7_flavor_id_filter.loadbalancers[*].l7_flavor_id : 
   v == local.l7_flavor_id]
   ) 
 }
 
 
-data "huaweicloud_elb_loadbalancers" "type_filter" {
+data "hcso_elb_loadbalancers" "type_filter" {
   type       = "dedicated"
-  depends_on = [huaweicloud_elb_loadbalancer.test]
+  depends_on = [hcso_elb_loadbalancer.test]
 }
 locals {
   type       = "dedicated"
 }
 output "type_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.type_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.type_filter.loadbalancers[*].type : 
+  value = length(data.hcso_elb_loadbalancers.type_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.type_filter.loadbalancers[*].type : 
   v == local.type]
   ) 
 }
 
-data "huaweicloud_elb_loadbalancers" "enterprise_project_id_filter" {
-  depends_on = [huaweicloud_elb_loadbalancer.test]
+data "hcso_elb_loadbalancers" "enterprise_project_id_filter" {
+  depends_on = [hcso_elb_loadbalancer.test]
 }
 locals {
-  enterprise_project_id = huaweicloud_elb_loadbalancer.test.enterprise_project_id
+  enterprise_project_id = hcso_elb_loadbalancer.test.enterprise_project_id
 }
 output "enterprise_project_id_is_useful" {
-  value = length(data.huaweicloud_elb_loadbalancers.enterprise_project_id_filter.loadbalancers) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_loadbalancers.enterprise_project_id_filter.loadbalancers[*].enterprise_project_id : 
+  value = length(data.hcso_elb_loadbalancers.enterprise_project_id_filter.loadbalancers) > 0 && alltrue(
+  [for v in data.hcso_elb_loadbalancers.enterprise_project_id_filter.loadbalancers[*].enterprise_project_id : 
   v == local.enterprise_project_id]
   ) 
 }
