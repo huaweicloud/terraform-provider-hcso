@@ -24,6 +24,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lts"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
@@ -339,6 +340,17 @@ func Provider() *schema.Provider {
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
 
+			"hcso_rds_backups":              rds.DataSourceBackup(),
+			"hcso_rds_engine_versions":      rds.DataSourceRdsEngineVersionsV3(),
+			"hcso_rds_flavors":              rds.DataSourceRdsFlavor(),
+			"hcso_rds_instances":            rds.DataSourceRdsInstances(),
+			"hcso_rds_mysql_accounts":       rds.DataSourceRdsMysqlAccounts(),
+			"hcso_rds_mysql_databases":      rds.DataSourceRdsMysqlDatabases(),
+			"hcso_rds_parametergroups":      rds.DataSourceParametergroups(),
+			"hcso_rds_pg_plugins":           rds.DataSourcePgPlugins(),
+			"hcso_rds_sqlserver_collations": rds.DataSourceSQLServerCollations(),
+			"hcso_rds_storage_types":        rds.DataSourceStoragetype(),
+
 			"hcso_sfs_turbos": sfs.DataSourceTurbos(),
 
 			"hcso_vpc":                    vpc.DataSourceVpcV1(),
@@ -407,6 +419,23 @@ func Provider() *schema.Provider {
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+
+			"hcso_rds_backup":                       rds.ResourceBackup(),
+			"hcso_rds_cross_region_backup_strategy": rds.ResourceBackupStrategy(),
+			"hcso_rds_instance":                     rds.ResourceRdsInstance(),
+			"hcso_rds_mysql_account":                rds.ResourceMysqlAccount(),
+			"hcso_rds_mysql_binlog":                 rds.ResourceMysqlBinlog(),
+			"hcso_rds_mysql_database_privilege":     rds.ResourceMysqlDatabasePrivilege(),
+			"hcso_rds_mysql_database":               rds.ResourceMysqlDatabase(),
+			"hcso_rds_parametergroup":               rds.ResourceRdsConfiguration(),
+			"hcso_rds_pg_account":                   rds.ResourcePgAccount(),
+			"hcso_rds_pg_database":                  rds.ResourcePgDatabase(),
+			"hcso_rds_pg_plugin":                    rds.ResourceRdsPgPlugin(),
+			"hcso_rds_read_replica_instance":        rds.ResourceRdsReadReplicaInstance(),
+			"hcso_rds_sql_audit":                    rds.ResourceSQLAudit(),
+			"hcso_rds_sqlserver_account":            rds.ResourceSQLServerAccount(),
+			"hcso_rds_sqlserver_database_privilege": rds.ResourceSQLServerDatabasePrivilege(),
+			"hcso_rds_sqlserver_database":           rds.ResourceSQLServerDatabase(),
 
 			"hcso_sfs_turbo": sfs.ResourceSFSTurbo(),
 
