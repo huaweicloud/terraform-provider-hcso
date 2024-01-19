@@ -7,7 +7,6 @@ data "hcso_images_image" "default" {
 
 data "hcso_compute_flavors" "default" {
   availability_zone = data.hcso_availability_zones.default.names[0]
-  performance_type  = "normal"
   cpu_core_count    = 2
   memory_size       = 4
 }

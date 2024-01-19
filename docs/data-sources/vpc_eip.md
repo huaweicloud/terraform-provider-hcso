@@ -9,8 +9,10 @@ Use this data source to get the details of an available EIP.
 ## Example Usage
 
 ```hcl
+variable "public_ip" {}
+
 data "hcso_vpc_eip" "by_address" {
-  public_ip = "123.60.208.163"
+  public_ip = var.public_ip
 }
 ```
 

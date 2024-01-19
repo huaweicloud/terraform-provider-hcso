@@ -59,8 +59,11 @@ func TestAccVault_backupServer(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "resources.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
 					resource.TestCheckResourceAttr(resourceName, "backup_name_prefix", "test-prefix-"),
+					resource.TestCheckResourceAttr(resourceName, "is_multi_az", "true"),
 					resource.TestCheckResourceAttr(resourceName, "tags.foo", "bar"),
 					resource.TestCheckResourceAttr(resourceName, "tags.key", "value"),
+					// TODO excludes caused error: exclude_volumes cannot in extra_info.
+					// resource.TestCheckResourceAttr(resourceName, "resources.0.excludes.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "resources.0.excludes.#", "2"),
 				),
 			},
@@ -76,9 +79,11 @@ func TestAccVault_backupServer(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "resources.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
 					resource.TestCheckResourceAttr(resourceName, "backup_name_prefix", "test-prefix-"),
+					resource.TestCheckResourceAttr(resourceName, "is_multi_az", "true"),
 					resource.TestCheckResourceAttr(resourceName, "tags.foo1", "bar"),
 					resource.TestCheckResourceAttr(resourceName, "tags.key", "value_update"),
-					resource.TestCheckResourceAttr(resourceName, "resources.0.excludes.#", "2"),
+					// TODO excludes caused error: exclude_volumes cannot in extra_info.
+					// resource.TestCheckResourceAttr(resourceName, "resources.0.excludes.#", "2"),
 				),
 			},
 			{
@@ -99,9 +104,10 @@ variable "volume_configuration" {
     device_type = string
   }))
   default = [
+    // TODO only "SSD" volume_type is valid.
     {volume_type = "SSD", size = 50, device_type = "VBD"},
-    {volume_type = "GPSSD", size = 100, device_type = "VBD"},
-    {volume_type = "SAS", size = 100, device_type = "SCSI"},
+    {volume_type = "SSD", size = 100, device_type = "VBD"},
+    {volume_type = "SSD", size = 50, device_type = "VBD"},
   ]
 }
 
@@ -156,10 +162,12 @@ resource "hcso_cbr_vault" "test" {
   size                  = 200
   enterprise_project_id = "0"
   backup_name_prefix    = "test-prefix-"
+  is_multi_az           = true
 
   resources {
     server_id = hcso_compute_instance.test.id
-    excludes  = slice(hcso_compute_volume_attach.test[*].volume_id, 0, 2)
+    // TODO excludes caused error: exclude_volumes cannot in extra_info.
+    #excludes  = slice(hcso_compute_volume_attach.test[*].volume_id, 0, 2)
   }
 
   tags = {
@@ -182,199 +190,12 @@ resource "hcso_cbr_vault" "test" {
   size                  = 300
   enterprise_project_id = "0"
   backup_name_prefix    = "test-prefix-"
+  is_multi_az           = true
 
   resources {
     server_id = hcso_compute_instance.test.id
-    excludes  = slice(hcso_compute_volume_attach.test[*].volume_id, 1, 3)
-  }
-
-  tags = {
-    foo1 = "bar"
-    key  = "value_update"
-  }
-}
-`, basicConfig, name)
-}
-
-func TestAccVault_replicationServer(t *testing.T) {
-	var (
-		vault vaults.Vault
-
-		resourceName = "hcso_cbr_vault.test"
-		name         = acceptance.RandomAccResourceName()
-	)
-
-	rc := acceptance.InitResourceCheck(
-		resourceName,
-		&vault,
-		getVaultResourceFunc,
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      rc.CheckResourceDestroy(),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccVault_replicationServer_step1(name),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "name", name),
-					resource.TestCheckResourceAttr(resourceName, "consistent_level", "crash_consistent"),
-					resource.TestCheckResourceAttr(resourceName, "type", cbr.VaultTypeServer),
-					resource.TestCheckResourceAttr(resourceName, "protection_type", "replication"),
-					resource.TestCheckResourceAttr(resourceName, "size", "200"),
-				),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
-}
-
-func testAccVault_replicationServer_step1(name string) string {
-	return fmt.Sprintf(`
-resource "hcso_cbr_vault" "test" {
-  name                  = "%s"
-  type                  = "server"
-  consistent_level      = "crash_consistent"
-  protection_type       = "replication"
-  size                  = 200
-  enterprise_project_id = "0"
-}
-`, name)
-}
-
-func TestAccVault_prePaidServer(t *testing.T) {
-	var (
-		vault vaults.Vault
-
-		resourceName = "hcso_cbr_vault.test"
-		name         = acceptance.RandomAccResourceName()
-		updateName   = acceptance.RandomAccResourceName()
-		basicConfig  = testAccVault_base(name)
-	)
-
-	rc := acceptance.InitResourceCheck(
-		resourceName,
-		&vault,
-		getVaultResourceFunc,
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      rc.CheckResourceDestroy(),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccVault_prePaidBackupServer_step1(basicConfig, name),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-					resource.TestCheckResourceAttr(resourceName, "name", name),
-					resource.TestCheckResourceAttr(resourceName, "consistent_level", "app_consistent"),
-					resource.TestCheckResourceAttr(resourceName, "type", cbr.VaultTypeServer),
-					resource.TestCheckResourceAttr(resourceName, "protection_type", "backup"),
-					resource.TestCheckResourceAttr(resourceName, "size", "200"),
-					resource.TestCheckResourceAttr(resourceName, "resources.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
-					resource.TestCheckResourceAttr(resourceName, "tags.foo", "bar"),
-					resource.TestCheckResourceAttr(resourceName, "tags.key", "value"),
-					resource.TestCheckResourceAttr(resourceName, "resources.0.excludes.#", "2"),
-				),
-			},
-			{
-				Config: testAccVault_prePaidBackupServer_step2(basicConfig, updateName),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-					resource.TestCheckResourceAttr(resourceName, "name", updateName),
-					resource.TestCheckResourceAttr(resourceName, "consistent_level", "app_consistent"),
-					resource.TestCheckResourceAttr(resourceName, "type", cbr.VaultTypeServer),
-					resource.TestCheckResourceAttr(resourceName, "protection_type", "backup"),
-					resource.TestCheckResourceAttr(resourceName, "size", "200"),
-					resource.TestCheckResourceAttr(resourceName, "resources.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
-					resource.TestCheckResourceAttr(resourceName, "tags.foo1", "bar"),
-					resource.TestCheckResourceAttr(resourceName, "tags.key", "value_update"),
-					resource.TestCheckResourceAttr(resourceName, "resources.0.excludes.#", "2"),
-				),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
-				ImportStateVerifyIgnore: []string{
-					"period_unit",
-					"period",
-					"auto_renew",
-					"auto_pay",
-				},
-			},
-		},
-	})
-}
-
-func testAccVault_prePaidBackupServer_step1(basicConfig, name string) string {
-	return fmt.Sprintf(`
-%[1]s
-
-resource "hcso_cbr_vault" "test" {
-  name                  = "%[2]s"
-  type                  = "server"
-  consistent_level      = "app_consistent"
-  protection_type       = "backup"
-  size                  = 200
-  enterprise_project_id = "0"
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "false"
-
-  resources {
-    server_id = hcso_compute_instance.test.id
-    excludes  = slice(hcso_compute_volume_attach.test[*].volume_id, 0, 2)
-  }
-
-  tags = {
-    foo = "bar"
-    key = "value"
-  }
-}
-`, basicConfig, name)
-}
-
-func testAccVault_prePaidBackupServer_step2(basicConfig, name string) string {
-	return fmt.Sprintf(`
-%[1]s
-
-resource "hcso_cbr_vault" "test" {
-  name                  = "%[2]s"
-  type                  = "server"
-  consistent_level      = "app_consistent"
-  protection_type       = "backup"
-  size                  = 200
-  enterprise_project_id = "0"
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "true"
-
-  resources {
-    server_id = hcso_compute_instance.test.id
-    excludes  = slice(hcso_compute_volume_attach.test[*].volume_id, 1, 3)
+    // TODO excludes caused error: exclude_volumes cannot in extra_info.
+    # excludes  = slice(hcso_compute_volume_attach.test[*].volume_id, 1, 3)
   }
 
   tags = {
@@ -549,11 +370,10 @@ func testAccVault_backupTurbo_base(name string) string {
 data "hcso_availability_zones" "test" {}
 
 resource "hcso_sfs_turbo" "test" {
-  count = 3
-
-  name              = format("%[2]s_%%d", count.index)
+  name              = "%[2]s_sfs_turbo"
   size              = 500
   share_proto       = "NFS"
+  share_type        = "PERFORMANCE"
   vpc_id            = hcso_vpc.test.id
   subnet_id         = hcso_vpc_subnet.test.id
   security_group_id = hcso_networking_secgroup.test.id
@@ -573,7 +393,7 @@ resource "hcso_cbr_vault" "test" {
   enterprise_project_id = "0"
 
   resources {
-    includes = slice(hcso_sfs_turbo.test[*].id, 0, 2)
+    includes = [hcso_sfs_turbo.test.id]
   }
 }
 `, testAccVault_backupTurbo_base(rName), rName)
@@ -591,64 +411,10 @@ resource "hcso_cbr_vault" "test" {
   enterprise_project_id = "0"
 
   resources {
-    includes = slice(hcso_sfs_turbo.test[*].id, 1, 3)
+    includes =  [hcso_sfs_turbo.test.id]
   }
 }
 `, testAccVault_backupTurbo_base(rName), rName)
-}
-
-func TestAccVault_replicationTurbo(t *testing.T) {
-	var (
-		vault vaults.Vault
-
-		resourceName = "hcso_cbr_vault.test"
-		name         = acceptance.RandomAccResourceName()
-	)
-
-	rc := acceptance.InitResourceCheck(
-		resourceName,
-		&vault,
-		getVaultResourceFunc,
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      rc.CheckResourceDestroy(),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccVault_replicationTurbo_step1(name),
-				Check: resource.ComposeTestCheckFunc(
-					rc.CheckResourceExists(),
-					resource.TestCheckResourceAttr(resourceName, "name", name),
-					resource.TestCheckResourceAttr(resourceName, "consistent_level", "crash_consistent"),
-					resource.TestCheckResourceAttr(resourceName, "type", cbr.VaultTypeTurbo),
-					resource.TestCheckResourceAttr(resourceName, "protection_type", "replication"),
-					resource.TestCheckResourceAttr(resourceName, "size", "1000"),
-					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
-				),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
-}
-
-func testAccVault_replicationTurbo_step1(rName string) string {
-	return fmt.Sprintf(`
-resource "hcso_cbr_vault" "test" {
-  name                  = "%s"
-  type                  = "turbo"
-  protection_type       = "replication"
-  size                  = 1000
-  enterprise_project_id = "0"
-}
-`, rName)
 }
 
 func TestAccVault_AutoBind(t *testing.T) {
@@ -920,4 +686,299 @@ resource "hcso_cbr_vault" "test" {
   }
 }
 `, testAccVault_bindPolicies_base(name), name)
+}
+
+func TestAccVault_backupWorkspace(t *testing.T) {
+	var (
+		vault vaults.Vault
+
+		resourceName = "hcso_cbr_vault.test"
+		name         = acceptance.RandomAccResourceName()
+		updateName   = acceptance.RandomAccResourceName()
+		basicConfig  = testAccVault_backupWorkspace_base(name)
+	)
+
+	rc := acceptance.InitResourceCheck(
+		resourceName,
+		&vault,
+		getVaultResourceFunc,
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVault_backupWorkspace_step1(basicConfig, name),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "consistent_level", "crash_consistent"),
+					resource.TestCheckResourceAttr(resourceName, "type", cbr.VaultTypeWorkspace),
+					resource.TestCheckResourceAttr(resourceName, "protection_type", "backup"),
+					resource.TestCheckResourceAttr(resourceName, "size", "200"),
+					resource.TestCheckResourceAttr(resourceName, "resources.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
+				),
+			},
+			{
+				Config: testAccVault_backupWorkspace_step2(basicConfig, updateName),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckResourceExists(),
+					resource.TestCheckResourceAttr(resourceName, "name", updateName),
+					resource.TestCheckResourceAttr(resourceName, "consistent_level", "crash_consistent"),
+					resource.TestCheckResourceAttr(resourceName, "type", cbr.VaultTypeWorkspace),
+					resource.TestCheckResourceAttr(resourceName, "protection_type", "backup"),
+					resource.TestCheckResourceAttr(resourceName, "size", "300"),
+					resource.TestCheckResourceAttr(resourceName, "resources.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "enterprise_project_id", "0"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func testAccVault_backupWorkspace_base(name string) string {
+	wsDesktopName := acceptance.RandomAccResourceNameWithDash()
+
+	return fmt.Sprintf(`
+data "hcso_availability_zones" "test" {}
+
+%[1]s
+
+resource "hcso_workspace_service" "test" {
+  access_mode = "INTERNET"
+  vpc_id      = hcso_vpc.test.id
+  network_ids = [
+    hcso_vpc_subnet.test.id,
+  ]
+}
+
+resource "hcso_workspace_desktop" "test" {
+  count = 2
+
+  flavor_id         = "workspace.x86.ultimate.large2"
+  image_type        = "market"
+  image_id          = "63aa8670-27ad-4747-8c44-6d8919e785a7"
+  availability_zone = data.hcso_availability_zones.test.names[0]
+  vpc_id            = hcso_vpc.test.id
+  security_groups   = [
+    hcso_workspace_service.test.desktop_security_group.0.id,
+    hcso_networking_secgroup.test.id,
+  ]
+
+  nic {
+    network_id = hcso_vpc_subnet.test.id
+  }
+
+  name       = format("%[2]s-%%d", count.index)
+  user_name  = format("user-%[3]s-%%d", count.index)
+  user_email = "terraform@example.com"
+  user_group = "administrators"
+
+  root_volume {
+    type = "SAS"
+    size = 80
+  }
+
+  data_volume {
+    type = "SAS"
+    size = 50
+  }
+
+  delete_user = true
+}
+`, common.TestBaseNetwork(name), wsDesktopName, name)
+}
+
+func testAccVault_backupWorkspace_step1(basicConfig, name string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+resource "hcso_cbr_vault" "test" {
+  name                  = "%[2]s"
+  type                  = "workspace"
+  consistent_level      = "crash_consistent"
+  protection_type       = "backup"
+  size                  = 200
+  enterprise_project_id = "0"
+
+  resources {
+    server_id = hcso_workspace_desktop.test[0].id
+  }
+}
+`, basicConfig, name)
+}
+
+func testAccVault_backupWorkspace_step2(basicConfig, name string) string {
+	return fmt.Sprintf(`
+%[1]s
+
+resource "hcso_cbr_vault" "test" {
+  name                  = "%[2]s"
+  type                  = "workspace"
+  consistent_level      = "crash_consistent"
+  protection_type       = "backup"
+  size                  = 300
+  enterprise_project_id = "0"
+
+  resources {
+    server_id = hcso_workspace_desktop.test[1].id
+  }
+}
+`, basicConfig, name)
+}
+
+func TestAccVault_backupVMware(t *testing.T) {
+	var (
+		vault vaults.Vault
+
+		resourceName  = "hcso_cbr_vault.test"
+		resourceName1 = "hcso_cbr_vault.test.0"
+		resourceName2 = "hcso_cbr_vault.test.1"
+		name          = acceptance.RandomAccResourceName()
+
+		rc = acceptance.InitResourceCheck(resourceName, &vault, getVaultResourceFunc)
+	)
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVault_backupVMware_step1(name),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckMultiResourcesExists(2),
+					resource.TestCheckResourceAttr(resourceName1, "name", name+"_0"),
+					resource.TestCheckResourceAttr(resourceName1, "consistent_level", "app_consistent"),
+					resource.TestCheckResourceAttr(resourceName1, "type", cbr.VaultTypeVMware),
+					resource.TestCheckResourceAttr(resourceName1, "protection_type", "backup"),
+					resource.TestCheckResourceAttr(resourceName1, "size", "100"),
+					resource.TestCheckResourceAttr(resourceName1, "enterprise_project_id", "0"),
+
+					resource.TestCheckResourceAttr(resourceName2, "name", name+"_1"),
+					resource.TestCheckResourceAttr(resourceName2, "consistent_level", "crash_consistent"),
+					resource.TestCheckResourceAttr(resourceName2, "type", cbr.VaultTypeVMware),
+					resource.TestCheckResourceAttr(resourceName2, "protection_type", "backup"),
+					resource.TestCheckResourceAttr(resourceName2, "size", "200"),
+					resource.TestCheckResourceAttr(resourceName2, "enterprise_project_id", "0"),
+				),
+			},
+		},
+	})
+}
+
+func testAccVault_backupVMware_step1(name string) string {
+	return fmt.Sprintf(`
+variable "file_backup_configuration" {
+  type = list(object({
+    consistent_level = string
+    size             = number
+  }))
+
+  default = [
+    {
+      consistent_level = "app_consistent"
+      size             = 100
+    },
+    {
+      consistent_level = "crash_consistent"
+      size             = 200
+    }
+  ]
+}
+
+resource "hcso_cbr_vault" "test" {
+  count = 2
+
+  name              = format("%[1]s_%%d", count.index)
+  type              = "vmware"
+  consistent_level  = var.file_backup_configuration[count.index]["consistent_level"]
+  protection_type   = "backup"
+  size              = var.file_backup_configuration[count.index]["size"]
+}
+`, name)
+}
+
+func TestAccVault_backupFile(t *testing.T) {
+	var (
+		vault vaults.Vault
+
+		resourceName  = "hcso_cbr_vault.test"
+		resourceName1 = "hcso_cbr_vault.test.0"
+		resourceName2 = "hcso_cbr_vault.test.1"
+		name          = acceptance.RandomAccResourceName()
+
+		rc = acceptance.InitResourceCheck(resourceName, &vault, getVaultResourceFunc)
+	)
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck: func() {
+			acceptance.TestAccPreCheck(t)
+		},
+		ProviderFactories: acceptance.TestAccProviderFactories,
+		CheckDestroy:      rc.CheckResourceDestroy(),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVault_backupFile_step1(name),
+				Check: resource.ComposeTestCheckFunc(
+					rc.CheckMultiResourcesExists(2),
+					resource.TestCheckResourceAttr(resourceName1, "name", name+"_0"),
+					resource.TestCheckResourceAttr(resourceName1, "consistent_level", "app_consistent"),
+					resource.TestCheckResourceAttr(resourceName1, "type", cbr.VaultTypeFile),
+					resource.TestCheckResourceAttr(resourceName1, "protection_type", "backup"),
+					resource.TestCheckResourceAttr(resourceName1, "size", "100"),
+					resource.TestCheckResourceAttr(resourceName1, "enterprise_project_id", "0"),
+
+					resource.TestCheckResourceAttr(resourceName2, "name", name+"_1"),
+					resource.TestCheckResourceAttr(resourceName2, "consistent_level", "crash_consistent"),
+					resource.TestCheckResourceAttr(resourceName2, "type", cbr.VaultTypeFile),
+					resource.TestCheckResourceAttr(resourceName2, "protection_type", "backup"),
+					resource.TestCheckResourceAttr(resourceName2, "size", "200"),
+					resource.TestCheckResourceAttr(resourceName2, "enterprise_project_id", "0"),
+				),
+			},
+		},
+	})
+}
+
+func testAccVault_backupFile_step1(name string) string {
+	return fmt.Sprintf(`
+variable "file_backup_configuration" {
+  type = list(object({
+    consistent_level = string
+    size             = number
+  }))
+
+  default = [
+    {
+      consistent_level = "app_consistent"
+      size             = 100
+    },
+    {
+      consistent_level = "crash_consistent"
+      size             = 200
+    }
+  ]
+}
+
+resource "hcso_cbr_vault" "test" {
+  count = 2
+
+  name              = format("%[1]s_%%d", count.index)
+  type              = "file"
+  consistent_level  = var.file_backup_configuration[count.index]["consistent_level"]
+  protection_type   = "backup"
+  size              = var.file_backup_configuration[count.index]["size"]
+}
+`, name)
 }

@@ -17,7 +17,6 @@ data "hcso_availability_zones" "myaz" {}
 
 data "hcso_compute_flavors" "myflavor" {
   availability_zone = data.hcso_availability_zones.myaz.names[0]
-  performance_type  = "normal"
   cpu_core_count    = 2
   memory_size       = 4
 }
@@ -27,8 +26,12 @@ data "hcso_vpc_subnets" "mynet" {
 }
 
 data "hcso_images_image" "myimage" {
-  name        = "Ubuntu 18.04 server 64bit"
+  name_regex  = "^Ubuntu 18.04 server 64bit"
   most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
 }
 
 resource "hcso_compute_instance" "basic" {
@@ -37,10 +40,10 @@ resource "hcso_compute_instance" "basic" {
   flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
   security_group_ids = [var.secgroup_id]
   availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
-  system_disk_type = "SSD"
-  system_disk_size = 40
-  
   network {
     uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
@@ -52,19 +55,39 @@ resource "hcso_compute_instance" "basic" {
 ```hcl
 variable "secgroup_id" {}
 
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
+}
+
 resource "hcso_compute_instance" "myinstance" {
   name               = "myinstance"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
   security_group_ids = [var.secgroup_id]
-  availability_zone  = "cn-north-4a"
-  
-  system_disk_type = "SSD"
-  system_disk_size = 40
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
 }
 
@@ -91,26 +114,46 @@ resource "hcso_compute_eip_associate" "associated" {
 ```hcl
 variable "secgroup_id" {}
 
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
+}
+
 resource "hcso_evs_volume" "myvolume" {
   name              = "myvolume"
-  availability_zone = "cn-north-4a"
-  volume_type       = "SAS"
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  volume_type       = "SSD"
   size              = 10
 }
 
 resource "hcso_compute_instance" "myinstance" {
   name               = "myinstance"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
   security_group_ids = [var.secgroup_id]
-  availability_zone  = "cn-north-4a"
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
-  system_disk_type = "SSD"
-  system_disk_size = 40
-  
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
 }
 
@@ -128,31 +171,51 @@ ensure the volume attached order. So it's recommended to use `Instance With Atta
 ```hcl
 variable "secgroup_id" {}
 
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
+}
+
 resource "hcso_compute_instance" "multi-disk" {
-  name               = "multi-net"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
+  name               = "multi-disk"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
   security_group_ids = [var.secgroup_id]
-  availability_zone  = "cn-north-4a"
-
-  system_disk_type = "SSD"
-  system_disk_size = 40
-
-  data_disks {
-    type = "SAS"
-    size = "10"
-  }
-  data_disks {
-    type = "SAS"
-    size = "20"
-  }
-
-  delete_disks_on_termination = true
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
+
+  data_disks {
+    type = "SSD"
+    size = 10
+  }
+  data_disks {
+    type = "SSD"
+    size = 20
+  }
+  
+  delete_disks_on_termination = true
 }
 ```
 
@@ -161,23 +224,47 @@ resource "hcso_compute_instance" "multi-disk" {
 ```hcl
 variable "secgroup_id" {}
 
+data "hcso_availability_zones" "myaz" {}
+
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_vpc_subnets" "mynet-ipv4" {
+  name = "subnet-ipv4"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
+}
+
 resource "hcso_compute_instance" "multi-net" {
   name               = "multi-net"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
   security_group_ids = [var.secgroup_id]
-  availability_zone  = "cn-north-4a"
-
-  system_disk_type = "SSD"
-  system_disk_size = 40
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
 
   network {
-    uuid = "3c4a0d74-24b9-46cf-9d7f-8b7a4dc2f65c"
+    uuid = data.hcso_vpc_subnets.mynet-ipv4.subnets[0].id
   }
 }
 ```
@@ -187,20 +274,41 @@ resource "hcso_compute_instance" "multi-net" {
 ```hcl
 variable "secgroup_id" {}
 
-resource "hcso_compute_instance" "myinstance" {
-  name               = "instance"
-  image_id           = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id          = "s6.small.1"
-  key_pair           = "my_key_pair_name"
-  security_group_ids = [var.secgroup_id]
-  availability_zone  = "az"
-  user_data          = "#cloud-config\nhostname: instance_1.example.com\nfqdn: instance_1.example.com"
+data "hcso_availability_zones" "myaz" {}
 
-  system_disk_type = "SSD"
-  system_disk_size = 40
+data "hcso_compute_flavors" "myflavor" {
+  availability_zone = data.hcso_availability_zones.myaz.names[0]
+  cpu_core_count    = 2
+  memory_size       = 4
+}
+
+data "hcso_vpc_subnets" "mynet" {
+  name = "subnet-default"
+}
+
+data "hcso_images_image" "myimage" {
+  name_regex  = "^Ubuntu 18.04 server 64bit"
+  most_recent = true
+}
+
+resource "hcso_compute_keypair" "my-keypair" {
+  name = "my-keypair"
+}
+
+resource "hcso_compute_instance" "user-data" {
+  name               = "user-data"
+  image_id           = data.hcso_images_image.myimage.id
+  flavor_id          = data.hcso_compute_flavors.myflavor.ids[0]
+  security_group_ids = [var.secgroup_id]
+  availability_zone  = data.hcso_availability_zones.myaz.names[0]
+  key_pair           = hcso_compute_keypair.my-keypair.name
+  user_data          = "#cloud-config\nhostname: instance_1.example.com\nfqdn: instance_1.example.com"
+  
+  system_disk_type   = "SSD"
+  system_disk_size   = 40
 
   network {
-    uuid = "55534eaa-533a-419d-9b40-ec427ea7195a"
+    uuid = data.hcso_vpc_subnets.mynet.subnets[0].id
   }
 }
 ```
@@ -248,7 +356,7 @@ The following arguments are supported:
   Changing this creates a new instance.
 
   Available options are:
-  + `SAS`: High I/O disk type.
+  + `SSD`: High I/O disk type.
   + `SSD`: Ultra-high I/O disk type.
   + `GPSSD`: General purpose SSD disk type.
   + `ESSD`: Extreme SSD type.
@@ -365,7 +473,7 @@ The `data_disks` block supports:
 
   For details about disk types, see
   Available options are:
-  + `SAS`: High I/O disk type.
+  + `SSD`: High I/O disk type.
   + `SSD`: Ultra-high I/O disk type.
   + `GPSSD`: General purpose SSD disk type.
   + `ESSD`: Extreme SSD type.

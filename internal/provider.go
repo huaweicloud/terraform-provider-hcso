@@ -18,10 +18,13 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ecs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/eip"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/elb"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/evs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lts"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
@@ -298,10 +301,9 @@ func Provider() *schema.Provider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"hcso_availability_zones": huaweicloud.DataSourceAvailabilityZones(),
 
-			"hcso_compute_flavors":      ecs.DataSourceEcsFlavors(),
-			"hcso_compute_instance":     ecs.DataSourceComputeInstance(),
-			"hcso_compute_instances":    ecs.DataSourceComputeInstances(),
-			"hcso_compute_servergroups": ecs.DataSourceComputeServerGroups(),
+			"hcso_cbr_backup":   cbr.DataSourceBackup(),
+			"hcso_cbr_vaults":   cbr.DataSourceVaults(),
+			"hcso_cbr_policies": cbr.DataSourcePolicies(),
 
 			"hcso_cce_addon_template": cce.DataSourceAddonTemplate(),
 			"hcso_cce_cluster":        cce.DataSourceCCEClusterV3(),
@@ -312,13 +314,32 @@ func Provider() *schema.Provider {
 
 			"hcso_dns_zones": dns.DataSourceZones(),
 
+			"hcso_compute_flavors":      ecs.DataSourceEcsFlavors(),
+			"hcso_compute_instance":     ecs.DataSourceComputeInstance(),
+			"hcso_compute_instances":    ecs.DataSourceComputeInstances(),
+			"hcso_compute_servergroups": ecs.DataSourceComputeServerGroups(),
+
 			"hcso_evs_volumes": evs.DataSourceEvsVolumesV2(),
+
+			"hcso_elb_certificate":       elb.DataSourceELBCertificateV3(),
+			"hcso_elb_flavors":           elb.DataSourceElbFlavorsV3(),
+			"hcso_elb_ipgroups":          elb.DataSourceElbIpGroups(),
+			"hcso_elb_l7policies":        elb.DataSourceElbL7policies(),
+			"hcso_elb_l7rules":           elb.DataSourceElbL7rules(),
+			"hcso_elb_listeners":         elb.DataSourceElbListeners(),
+			"hcso_elb_loadbalancers":     elb.DataSourceElbLoadbalances(),
+			"hcso_elb_logtanks":          elb.DataSourceElbLogtanks(),
+			"hcso_elb_members":           elb.DataSourceElbMembers(),
+			"hcso_elb_pools":             elb.DataSourcePools(),
+			"hcso_elb_security_policies": elb.DataSourceElbSecurityPolicies(),
 
 			"hcso_images_image":  ims.DataSourceImagesImageV2(),
 			"hcso_images_images": ims.DataSourceImagesImages(),
 
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
+
+			"hcso_sfs_turbos": sfs.DataSourceTurbos(),
 
 			"hcso_vpc":                    vpc.DataSourceVpcV1(),
 			"hcso_vpcs":                   vpc.DataSourceVpcs(),
@@ -334,7 +355,10 @@ func Provider() *schema.Provider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"hcso_cbr_vault": cbr.ResourceVault(),
+			"hcso_cbr_backup_share": cbr.ResourceBackupShare(),
+			"hcso_cbr_checkpoint":   cbr.ResourceCheckpoint(),
+			"hcso_cbr_policy":       cbr.ResourcePolicy(),
+			"hcso_cbr_vault":        cbr.ResourceVault(),
 
 			"hcso_cce_cluster":     cce.ResourceCluster(),
 			"hcso_cce_node":        cce.ResourceNode(),
@@ -349,7 +373,22 @@ func Provider() *schema.Provider {
 			"hcso_compute_eip_associate":    ecs.ResourceComputeEIPAssociate(),
 			"hcso_compute_volume_attach":    ecs.ResourceComputeVolumeAttach(),
 
-			"hcso_evs_volume": evs.ResourceEvsVolume(),
+			"hcso_elb_certificate":     elb.ResourceCertificateV3(),
+			"hcso_elb_ipgroup":         elb.ResourceIpGroupV3(),
+			"hcso_elb_l7policy":        elb.ResourceL7PolicyV3(),
+			"hcso_elb_l7rule":          elb.ResourceL7RuleV3(),
+			"hcso_elb_listener":        elb.ResourceListenerV3(),
+			"hcso_elb_loadbalancer":    elb.ResourceLoadBalancerV3(),
+			"hcso_elb_logtank":         elb.ResourceLogTank(),
+			"hcso_elb_member":          elb.ResourceMemberV3(),
+			"hcso_elb_monitor":         elb.ResourceMonitorV3(),
+			"hcso_elb_pool":            elb.ResourcePoolV3(),
+			"hcso_elb_security_policy": elb.ResourceSecurityPolicy(),
+			"hcso_lts_group":           lts.ResourceLTSGroup(),
+			"hcso_lts_stream":          lts.ResourceLTSStream(),
+
+			"hcso_evs_snapshot": evs.ResourceEvsSnapshotV2(),
+			"hcso_evs_volume":   evs.ResourceEvsVolume(),
 
 			"hcso_images_image":                ims.ResourceImsImage(),
 			"hcso_images_image_copy":           ims.ResourceImsImageCopy(),
@@ -369,6 +408,10 @@ func Provider() *schema.Provider {
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
 
+			"hcso_sfs_turbo": sfs.ResourceSFSTurbo(),
+
+			"hcso_tms_tags": tms.ResourceTmsTag(),
+
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
 			"hcso_vpc_subnet":                      vpc.ResourceVpcSubnetV1(),
@@ -383,8 +426,6 @@ func Provider() *schema.Provider {
 			"hcso_vpc_eip":                  eip.ResourceVpcEIPV1(),
 			"hcso_vpc_eip_associate":        eip.ResourceEIPAssociate(),
 			"hcso_networking_eip_associate": eip.ResourceEIPAssociate(),
-
-			"hcso_tms_tags": tms.ResourceTmsTag(),
 		},
 	}
 
