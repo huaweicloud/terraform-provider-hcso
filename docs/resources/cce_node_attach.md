@@ -173,7 +173,6 @@ In addition to all arguments above, the following attributes are exported:
 * `availability_zone` - The name of the available partition (AZ).
 * `ecs_group_id` - The Ecs group ID.
 * `subnet_id` - The ID of the subnet to which the NIC belongs.
-* `charging_mode` - The charging mode of the CCE node. Valid values are *prePaid* and *postPaid*.
 
 * `root_volume` - The configuration of the system disk.
   + `size` - The disk size in GB.
