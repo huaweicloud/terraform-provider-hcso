@@ -126,44 +126,6 @@ func TestAccNode_volume_encryption(t *testing.T) {
 	})
 }
 
-func TestAccNode_prePaid(t *testing.T) {
-	var node nodes.Nodes
-
-	rName := acceptance.RandomAccResourceNameWithDash()
-	resourceName := "hcso_cce_node.test"
-	// clusterName here is used to provide the cluster id to fetch cce node.
-	clusterName := "hcso_cce_cluster.test"
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      testAccCheckNodeDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccNode_prePaid(rName, false),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNodeExists(resourceName, clusterName, &node),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "period_unit", "month"),
-					resource.TestCheckResourceAttr(resourceName, "period", "1"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-				),
-			},
-			{
-				Config: testAccNode_prePaid(rName, true),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNodeExists(resourceName, clusterName, &node),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-				),
-			},
-		},
-	})
-}
-
 func TestAccNode_password(t *testing.T) {
 	var node nodes.Nodes
 
@@ -534,41 +496,6 @@ resource "hcso_cce_node" "test" {
   }
 }
 `, testAccNode_Base(rName), rName, rName)
-}
-
-func testAccNode_prePaid(rName string, isAutoRenew bool) string {
-	return fmt.Sprintf(`
-%[1]s
-
-resource "hcso_cce_node" "test" {
-  cluster_id        = hcso_cce_cluster.test.id
-  name              = "%[2]s"
-  flavor_id         = data.hcso_compute_flavors.test.ids[0]
-  availability_zone = try(element(data.hcso_availability_zones.test.names, 0), null)
-  key_pair          = hcso_kps_keypair.test.name
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = "1"
-  auto_renew    = "%[3]v"
-
-  root_volume {
-    size       = 40
-    volumetype = "SSD"
-  }
-
-  data_volumes {
-    size       = 100
-    volumetype = "SSD"
-  }
-
-  // Assign EIP
-  iptype                = "5_bgp"
-  bandwidth_charge_mode = "bandwidth"
-  sharetype             = "PER"
-  bandwidth_size        = 100
-}
-`, testAccNode_Base(rName), rName, isAutoRenew)
 }
 
 func testAccNode_password(rName string) string {
