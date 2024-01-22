@@ -13,6 +13,7 @@ import (
 
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/antiddos"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dns"
@@ -367,6 +368,8 @@ func Provider() *schema.Provider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
+			"hcso_antiddos_basic": antiddos.ResourceCloudNativeAntiDdos(),
+
 			"hcso_cbr_backup_share": cbr.ResourceBackupShare(),
 			"hcso_cbr_checkpoint":   cbr.ResourceCheckpoint(),
 			"hcso_cbr_policy":       cbr.ResourcePolicy(),

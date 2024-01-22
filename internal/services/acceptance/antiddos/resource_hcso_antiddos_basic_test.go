@@ -14,6 +14,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
+// TODO Failed by the OpenAPI of service Anti-DDoS not opened.
 func TestAccAntiDdos_basic(t *testing.T) {
 	rName := acceptance.RandomAccResourceName()
 	resourceName := "hcso_antiddos_basic.antiddos_1"
