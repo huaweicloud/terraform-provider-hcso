@@ -10,7 +10,7 @@ Use this data source to get the ID of an available Huawei Cloud Stack Online ima
 
 ```hcl
 data "hcso_images_image" "ubuntu" {
-  name        = "Ubuntu 18.04 server 64bit"
+  name        = "Ubuntu 18.04 server 64bit with ARM"
   visibility  = "public"
   most_recent = true
 }
@@ -23,7 +23,7 @@ data "hcso_images_image" "centos-1" {
 }
 
 data "hcso_images_image" "centos-2" {
-  architecture = "x86"
+  architecture = "arm"
   name_regex   = "^CentOS 7.5"
   visibility   = "public"
   most_recent  = true
