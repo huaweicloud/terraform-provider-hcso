@@ -24,6 +24,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/ims"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lb"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lts"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/mrs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
@@ -341,6 +342,8 @@ func Provider() *schema.Provider {
 			"hcso_lb_listeners":    lb.DataSourceListeners(),
 			"hcso_lb_loadbalancer": lb.DataSourceELBV2Loadbalancer(),
 
+			"hcso_mapreduce_clusters": mrs.DataSourceMrsClusters(),
+
 			"hcso_rds_backups":              rds.DataSourceBackup(),
 			"hcso_rds_engine_versions":      rds.DataSourceRdsEngineVersionsV3(),
 			"hcso_rds_flavors":              rds.DataSourceRdsFlavor(),
@@ -418,6 +421,9 @@ func Provider() *schema.Provider {
 			"hcso_lb_monitor":      lb.ResourceMonitorV2(),
 			"hcso_lb_pool":         lb.ResourcePoolV2(),
 			"hcso_lb_whitelist":    lb.ResourceWhitelistV2(),
+
+			"hcso_mapreduce_cluster": mrs.ResourceMRSClusterV2(),
+			"hcso_mapreduce_job":     mrs.ResourceMRSJobV2(),
 
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),

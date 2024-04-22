@@ -16,6 +16,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
+// TODO add job to cluster succeed,but job run failed by the component Spark2x is unavailable in the cluster.
 func TestAccMrsMapReduceJob_basic(t *testing.T) {
 	var job jobs.Job
 	resourceName := "hcso_mapreduce_job.test"
@@ -127,19 +128,19 @@ resource "hcso_mapreduce_cluster" "test" {
   component_list     = ["Hadoop", "Spark", "Hive", "Tez"]
 
   master_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
+    flavor            = "kc1.2xlarge.2.linux.bigdata"
+    node_number       = 3
     root_volume_type  = "SSD"
-    root_volume_size  = 300
+    root_volume_size  = 480
     data_volume_type  = "SSD"
     data_volume_size  = 480
     data_volume_count = 1
   }
   analysis_core_nodes {
-    flavor            = "c6.2xlarge.4.linux.bigdata"
-    node_number       = 2
+    flavor            = "kc1.2xlarge.2.linux.bigdata"
+    node_number       = 3
     root_volume_type  = "SSD"
-    root_volume_size  = 300
+    root_volume_size  = 480
     data_volume_type  = "SSD"
     data_volume_size  = 480
     data_volume_count = 1
