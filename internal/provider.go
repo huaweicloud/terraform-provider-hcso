@@ -349,6 +349,8 @@ func Provider() *schema.Provider {
 
 			"hcso_mapreduce_clusters": mrs.DataSourceMrsClusters(),
 
+			"hcso_nat_gateway": nat.DataSourcePublicGateway(),
+
 			"hcso_rds_backups":              rds.DataSourceBackup(),
 			"hcso_rds_engine_versions":      rds.DataSourceRdsEngineVersionsV3(),
 			"hcso_rds_flavors":              rds.DataSourceRdsFlavor(),
@@ -432,9 +434,13 @@ func Provider() *schema.Provider {
 			"hcso_mapreduce_cluster": mrs.ResourceMRSClusterV2(),
 			"hcso_mapreduce_job":     mrs.ResourceMRSJobV2(),
 
+			"hcso_nat_gateway":            nat.ResourcePublicGateway(),
 			"hcso_nat_private_gateway":    nat.ResourcePrivateGateway(),
 			"hcso_nat_private_snat_rule":  nat.ResourcePrivateSnatRule(),
 			"hcso_nat_private_transit_ip": nat.ResourcePrivateTransitIp(),
+			"hcso_nat_private_dnat_rule":  nat.ResourcePrivateDnatRule(),
+			"hcso_nat_snat_rule":          nat.ResourcePublicSnatRule(),
+			"hcso_nat_dnat_rule":          nat.ResourcePublicDnatRule(),
 
 			"hcso_rds_backup":                       rds.ResourceBackup(),
 			"hcso_rds_cross_region_backup_strategy": rds.ResourceBackupStrategy(),

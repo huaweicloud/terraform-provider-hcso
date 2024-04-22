@@ -57,6 +57,7 @@ data "hcso_compute_flavors" "test" {
 }
 
 data "hcso_images_image" "test" {
+  name        = "Ubuntu 18.04 server 64bit with ARM"
   name_regix        = "^Ubuntu 18.04 server 64bit"
   most_recent = true
 }

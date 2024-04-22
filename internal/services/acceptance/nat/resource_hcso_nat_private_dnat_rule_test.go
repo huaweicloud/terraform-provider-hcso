@@ -134,6 +134,7 @@ resource "hcso_compute_instance" "test" {
   security_groups   = [hcso_networking_secgroup.test.name]
   availability_zone = data.hcso_availability_zones.test.names[0]
   admin_pass        = "%[3]s"
+  system_disk_type  = "SSD"
 
   network {
     uuid = hcso_vpc_subnet.test.id
