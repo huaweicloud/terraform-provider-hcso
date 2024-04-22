@@ -18,7 +18,7 @@ import (
 func getResourceRepository(conf *config.Config, state *terraform.ResourceState) (interface{}, error) {
 	swrClient, err := conf.SwrV2Client(acceptance.HCSO_REGION_NAME)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating HuaweiCloud SWR client: %s", err)
+		return nil, fmt.Errorf("Error creating HCSO SWR client: %s", err)
 	}
 
 	return repositories.Get(swrClient, state.Primary.Attributes["organization"], state.Primary.ID).Extract()

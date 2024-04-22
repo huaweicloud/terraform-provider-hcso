@@ -30,6 +30,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/servicestage"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/swr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
@@ -454,8 +455,6 @@ func Provider() *schema.Provider {
 
 			"hcso_sfs_turbo": sfs.ResourceSFSTurbo(),
 
-			"hcso_tms_tags": tms.ResourceTmsTag(),
-
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
 			"hcso_vpc_subnet":                      vpc.ResourceVpcSubnetV1(),
@@ -470,6 +469,12 @@ func Provider() *schema.Provider {
 			"hcso_vpc_eip":                  eip.ResourceVpcEIPV1(),
 			"hcso_vpc_eip_associate":        eip.ResourceEIPAssociate(),
 			"hcso_networking_eip_associate": eip.ResourceEIPAssociate(),
+
+			"hcso_swr_organization":           swr.ResourceSWROrganization(),
+			"hcso_swr_repository":             swr.ResourceSWRRepository(),
+			"hcso_swr_image_retention_policy": swr.ResourceSwrImageRetentionPolicy(),
+
+			"hcso_tms_tags": tms.ResourceTmsTag(),
 		},
 	}
 
