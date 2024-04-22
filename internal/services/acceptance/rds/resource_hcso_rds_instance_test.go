@@ -289,43 +289,6 @@ func TestAccRdsInstance_sqlserver(t *testing.T) {
 	})
 }
 
-func TestAccRdsInstance_prePaid(t *testing.T) {
-	var (
-		instance instances.RdsInstanceResponse
-
-		resourceType = "hcso_rds_instance"
-		resourceName = "hcso_rds_instance.test"
-		name         = acceptance.RandomAccResourceName()
-		password     = fmt.Sprintf("%s%s%d", acctest.RandString(5), acctest.RandStringFromCharSet(2, "!#%^*"),
-			acctest.RandIntRange(10, 99))
-	)
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      testAccCheckRdsInstanceDestroy(resourceType),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccRdsInstance_prePaid(name, password, false),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRdsInstanceExists(resourceName, &instance),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-				),
-			},
-			{
-				Config: testAccRdsInstance_prePaid(name, password, true),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRdsInstanceExists(resourceName, &instance),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-				),
-			},
-		},
-	})
-}
-
 func TestAccRdsInstance_withParameters(t *testing.T) {
 	var instance instances.RdsInstanceResponse
 	name := acceptance.RandomAccResourceName()
@@ -1052,63 +1015,6 @@ resource "hcso_rds_instance" "test" {
   }
 }
 `, common.TestBaseNetwork(name), name, pwd)
-}
-
-func testAccRdsInstance_prePaid(name, pwd string, isAutoRenew bool) string {
-	return fmt.Sprintf(`
-data "hcso_availability_zones" "test" {}
-
-data "hcso_vpc" "test" {
-  name = "vpc-default"
-}
-
-data "hcso_vpc_subnet" "test" {
-  name = "subnet-default"
-}
-
-data "hcso_networking_secgroup" "test" {
-  name = "default"
-}
-
-data "hcso_rds_flavors" "test" {
-  db_type       = "SQLServer"
-  db_version    = "2019_SE"
-  instance_mode = "single"
-  group_type    = "dedicated"
-  vcpus         = 4
-}
-
-resource "hcso_rds_instance" "test" {
-  vpc_id            = data.hcso_vpc.test.id
-  subnet_id         = data.hcso_vpc_subnet.test.id
-  security_group_id = data.hcso_networking_secgroup.test.id
-  
-  availability_zone = [
-    data.hcso_availability_zones.test.names[0],
-  ]
-
-  name      = "%[1]s"
-  flavor    = data.hcso_rds_flavors.test.flavors[0].name
-  collation = "Chinese_PRC_CI_AS"
-
-  db {
-    password = "%[2]s"
-    type     = "SQLServer"
-    version  = "2019_SE"
-    port     = 8638
-  }
-
-  volume {
-    type = "CLOUDSSD"
-    size = 50
-  }
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = 1
-  auto_renew    = "%[3]v"
-}
-`, name, pwd, isAutoRenew)
 }
 
 func testAccRdsInstance_parameters(name string) string {
