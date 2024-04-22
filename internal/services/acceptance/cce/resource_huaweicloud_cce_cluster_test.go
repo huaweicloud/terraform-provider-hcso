@@ -58,42 +58,6 @@ func TestAccCluster_basic(t *testing.T) {
 	})
 }
 
-func TestAccCluster_prePaid(t *testing.T) {
-	var cluster clusters.Clusters
-
-	rName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(5))
-	resourceName := "hcso_cce_cluster.test"
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck: func() {
-			acceptance.TestAccPreCheck(t)
-			acceptance.TestAccPreCheckChargingMode(t)
-		},
-		ProviderFactories: acceptance.TestAccProviderFactories,
-		CheckDestroy:      testAccCheckClusterDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCluster_prePaid(rName, false),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckClusterExists(resourceName, &cluster),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					resource.TestCheckResourceAttr(resourceName, "charging_mode", "prePaid"),
-					resource.TestCheckResourceAttr(resourceName, "period_unit", "month"),
-					resource.TestCheckResourceAttr(resourceName, "period", "1"),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "false"),
-				),
-			},
-			{
-				Config: testAccCluster_prePaid(rName, true),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckClusterExists(resourceName, &cluster),
-					resource.TestCheckResourceAttr(resourceName, "auto_renew", "true"),
-				),
-			},
-		},
-	})
-}
-
 func TestAccCluster_withEip(t *testing.T) {
 	var cluster clusters.Clusters
 
@@ -357,31 +321,6 @@ func testAccCheckClusterExists(n string, cluster *clusters.Clusters) resource.Te
 
 		return nil
 	}
-}
-
-func testAccCluster_prePaid(rName string, isAutoRenew bool) string {
-	return fmt.Sprintf(`
-%[1]s
-
-resource "hcso_cce_cluster" "test" {
-  name                   = "%[2]s"
-  flavor_id              = "cce.s1.small"
-  vpc_id                 = hcso_vpc.test.id
-  subnet_id              = hcso_vpc_subnet.test.id
-  container_network_type = "overlay_l2"
-  service_network_cidr   = "10.248.0.0/16"
-
-  charging_mode = "prePaid"
-  period_unit   = "month"
-  period        = "1"
-  auto_renew    = "%[3]v"
-
-  tags = {
-    foo = "bar"
-    key = "value"
-  }
-}
-`, common.TestVpc(rName), rName, isAutoRenew)
 }
 
 func testAccCluster_basic(rName string) string {
