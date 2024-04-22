@@ -28,6 +28,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/mrs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/servicestage"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
@@ -357,6 +358,8 @@ func Provider() *schema.Provider {
 			"hcso_rds_pg_plugins":           rds.DataSourcePgPlugins(),
 			"hcso_rds_sqlserver_collations": rds.DataSourceSQLServerCollations(),
 			"hcso_rds_storage_types":        rds.DataSourceStoragetype(),
+
+			"hcso_servicestage_component_runtimes": servicestage.DataSourceComponentRuntimes(),
 
 			"hcso_sfs_turbos": sfs.DataSourceTurbos(),
 
