@@ -148,6 +148,7 @@ resource "hcso_compute_instance" "test" {
   flavor_id          = data.hcso_compute_flavors.test.ids[0]
   security_group_ids = [hcso_networking_secgroup.test.id]
   availability_zone  = data.hcso_availability_zones.test.names[0]
+  system_disk_type   = "SSD"
 
   network {
     uuid = hcso_vpc_subnet.test.id
