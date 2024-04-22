@@ -14,6 +14,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/antiddos"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/as"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cbr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/cce"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/dcs"
@@ -27,6 +28,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/lts"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/mrs"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/nat"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/smn"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/servicestage"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
@@ -304,6 +306,10 @@ func Provider() *schema.Provider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
+
+			"hcso_as_configurations": as.DataSourceASConfigurations(),
+			"hcso_as_groups":         as.DataSourceASGroups(),
+
 			"hcso_availability_zones": huaweicloud.DataSourceAvailabilityZones(),
 
 			"hcso_cbr_backup":   cbr.DataSourceBackup(),
@@ -379,6 +385,14 @@ func Provider() *schema.Provider {
 		ResourcesMap: map[string]*schema.Resource{
 			"hcso_antiddos_basic": antiddos.ResourceCloudNativeAntiDdos(),
 
+			"hcso_as_configuration":   as.ResourceASConfiguration(),
+			"hcso_as_group":           as.ResourceASGroup(),
+			"hcso_as_instance_attach": as.ResourceASInstanceAttach(),
+			"hcso_as_lifecycle_hook":  as.ResourceASLifecycleHook(),
+			"hcso_as_notification":    as.ResourceAsNotification(),
+			"hcso_as_policy":          as.ResourceASPolicy(),
+
+
 			"hcso_cbr_backup_share": cbr.ResourceBackupShare(),
 			"hcso_cbr_checkpoint":   cbr.ResourceCheckpoint(),
 			"hcso_cbr_policy":       cbr.ResourcePolicy(),
@@ -453,7 +467,7 @@ func Provider() *schema.Provider {
 			"hcso_rds_sqlserver_database":           rds.ResourceSQLServerDatabase(),
 
 			"hcso_sfs_turbo": sfs.ResourceSFSTurbo(),
-
+			"hcso_smn_topic": smn.ResourceTopic(),
 			"hcso_tms_tags": tms.ResourceTmsTag(),
 
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
