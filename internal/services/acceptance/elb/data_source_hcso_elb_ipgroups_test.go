@@ -6,11 +6,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/acceptance"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/services/acceptance"
 )
 
 func TestAccDatasourceIpGroups_basic(t *testing.T) {
-	rName := "data.huaweicloud_elb_ipgroups.test"
+	rName := "data.hcso_elb_ipgroups.test"
 	dc := acceptance.InitDataSourceCheck(rName)
 	name := acceptance.RandomAccResourceName()
 
@@ -44,53 +44,53 @@ func testAccDatasourceIpGroups_basic(name string) string {
 	return fmt.Sprintf(`
 %[1]s
 
-data "huaweicloud_elb_ipgroups" "test" {
-  depends_on = [huaweicloud_elb_ipgroup.test]
+data "hcso_elb_ipgroups" "test" {
+  depends_on = [hcso_elb_ipgroup.test]
 }
 
-data "huaweicloud_elb_ipgroups" "name_filter" {
-  depends_on = [huaweicloud_elb_ipgroup.test]
+data "hcso_elb_ipgroups" "name_filter" {
+  depends_on = [hcso_elb_ipgroup.test]
   name       = "%[2]s"
 }
 output "name_filter_is_useful" {
-  value = length(data.huaweicloud_elb_ipgroups.name_filter.ipgroups) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_ipgroups.name_filter.ipgroups[*].name :v == "%[2]s"]
+  value = length(data.hcso_elb_ipgroups.name_filter.ipgroups) > 0 && alltrue(
+  [for v in data.hcso_elb_ipgroups.name_filter.ipgroups[*].name :v == "%[2]s"]
   )  
 }
 
 locals {
-  ipgroup_id = huaweicloud_elb_ipgroup.test.id
+  ipgroup_id = hcso_elb_ipgroup.test.id
 }
-data "huaweicloud_elb_ipgroups" "ipgroup_id_filter" {
-  ipgroup_id = huaweicloud_elb_ipgroup.test.id
+data "hcso_elb_ipgroups" "ipgroup_id_filter" {
+  ipgroup_id = hcso_elb_ipgroup.test.id
 }
 output "ipgroup_id_filter_is_useful" {
-  value = length(data.huaweicloud_elb_ipgroups.ipgroup_id_filter.ipgroups) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_ipgroups.ipgroup_id_filter.ipgroups[*].id : v == local.ipgroup_id]
+  value = length(data.hcso_elb_ipgroups.ipgroup_id_filter.ipgroups) > 0 && alltrue(
+  [for v in data.hcso_elb_ipgroups.ipgroup_id_filter.ipgroups[*].id : v == local.ipgroup_id]
   )  
 }
 
 locals {
-  ip_address = huaweicloud_elb_ipgroup.test.ip_list[0].ip
+  ip_address = hcso_elb_ipgroup.test.ip_list[0].ip
 }
-data "huaweicloud_elb_ipgroups" "ip_address_filter" {
-  ip_address = huaweicloud_elb_ipgroup.test.ip_list[0].ip
+data "hcso_elb_ipgroups" "ip_address_filter" {
+  ip_address = hcso_elb_ipgroup.test.ip_list[0].ip
 }
 output "ip_address_filter_is_useful" {
-  value = length(data.huaweicloud_elb_ipgroups.ip_address_filter.ipgroups) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_ipgroups.ip_address_filter.ipgroups[*].ip_list[0].ip : v == local.ip_address]
+  value = length(data.hcso_elb_ipgroups.ip_address_filter.ipgroups) > 0 && alltrue(
+  [for v in data.hcso_elb_ipgroups.ip_address_filter.ipgroups[*].ip_list[0].ip : v == local.ip_address]
   )  
 }
 
 locals {
-  description = huaweicloud_elb_ipgroup.test.description
+  description = hcso_elb_ipgroup.test.description
 }
-data "huaweicloud_elb_ipgroups" "description_filter" {
-  description = huaweicloud_elb_ipgroup.test.description
+data "hcso_elb_ipgroups" "description_filter" {
+  description = hcso_elb_ipgroup.test.description
 }
 output "description_filter_is_useful" {
-  value = length(data.huaweicloud_elb_ipgroups.description_filter.ipgroups) > 0 && alltrue(
-  [for v in data.huaweicloud_elb_ipgroups.description_filter.ipgroups[*].description : v == local.description]
+  value = length(data.hcso_elb_ipgroups.description_filter.ipgroups) > 0 && alltrue(
+  [for v in data.hcso_elb_ipgroups.description_filter.ipgroups[*].description : v == local.description]
   )  
 }
 
