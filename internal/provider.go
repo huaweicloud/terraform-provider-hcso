@@ -31,6 +31,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/rds"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/servicestage"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/sfs"
+	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/smn"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/swr"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
@@ -368,6 +369,9 @@ func Provider() *schema.Provider {
 
 			"hcso_sfs_turbos": sfs.DataSourceTurbos(),
 
+			"hcso_smn_topics":            smn.DataSourceTopics(),
+			"hcso_smn_message_templates": smn.DataSourceSmnMessageTemplates(),
+
 			"hcso_vpc":                    vpc.DataSourceVpcV1(),
 			"hcso_vpcs":                   vpc.DataSourceVpcs(),
 			"hcso_vpc_subnet_ids":         vpc.DataSourceVpcSubnetIdsV1(),
@@ -465,6 +469,9 @@ func Provider() *schema.Provider {
 			"hcso_rds_sqlserver_database":           rds.ResourceSQLServerDatabase(),
 
 			"hcso_sfs_turbo": sfs.ResourceSFSTurbo(),
+
+			"hcso_smn_topic":            smn.ResourceTopic(),
+			"hcso_smn_message_template": smn.ResourceSmnMessageTemplate(),
 
 			"hcso_vpc":                             vpc.ResourceVirtualPrivateCloudV1(),
 			"hcso_vpc_address_group":               vpc.ResourceVpcAddressGroup(),
