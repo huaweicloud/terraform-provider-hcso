@@ -1,5 +1,99 @@
 # CHANGELOG
 
+## 0.2.0 (April 29, 2024)
+
+* **New Resource:**
+  + `hcso_antiddos_basic`
+  + `hcso_as_configuration`
+  + `hcso_as_group`
+  + `hcso_as_instance_attach`
+  + `hcso_as_lifecycle_hook`
+  + `hcso_as_notification`
+  + `hcso_as_policy`
+  + `hcso_cbr_backup_share`
+  + `hcso_cbr_checkpoint`
+  + `hcso_cbr_policy`
+  + `hcso_dws_alarm_subscription`
+  + `hcso_dws_event_subscription`
+  + `hcso_elb_certificate`
+  + `hcso_elb_ipgroup`
+  + `hcso_elb_l7policy`
+  + `hcso_elb_l7rule`
+  + `hcso_elb_listener`
+  + `hcso_elb_loadbalancer`
+  + `hcso_elb_logtank`
+  + `hcso_elb_member`
+  + `hcso_elb_monitor`
+  + `hcso_elb_pool`
+  + `hcso_elb_security_policy`
+  + `hcso_evs_snapshot`
+  + `hcso_lts_group`
+  + `hcso_lts_stream`
+  + `hcso_mapreduce_cluster`
+  + `hcso_mapreduce_job`
+  + `hcso_nat_dnat_rule`
+  + `hcso_nat_gateway`
+  + `hcso_nat_private_dnat_rule`
+  + `hcso_nat_snat_rule`
+  + `hcso_rds_backup`
+  + `hcso_rds_cross_region_backup_strategy`
+  + `hcso_rds_instance`
+  + `hcso_rds_mysql_account`
+  + `hcso_rds_mysql_binlog`
+  + `hcso_rds_mysql_database`
+  + `hcso_rds_mysql_database_privilege`
+  + `hcso_rds_parametergroup`
+  + `hcso_rds_pg_account`
+  + `hcso_rds_pg_database`
+  + `hcso_rds_pg_plugin`
+  + `hcso_rds_read_replica_instance`
+  + `hcso_rds_sql_audit`
+  + `hcso_rds_sqlserver_account`
+  + `hcso_rds_sqlserver_database`
+  + `hcso_rds_sqlserver_database_privilege`
+  + `hcso_sfs_turbo`
+  + `hcso_smn_message_template`
+  + `hcso_smn_topic`
+  + `hcso_swr_image_retention_policy`
+  + `hcso_swr_organization`
+  + `hcso_swr_repository`
+
+* **New Data Source:**
+  + `hcso_as_configurations`
+  + `hcso_as_groups`
+  + `hcso_cbr_backup`
+  + `hcso_cbr_policies`
+  + `hcso_cbr_vaults`
+  + `hcso_dcs_maintainwindow`
+  + `hcso_dws_flavors`
+  + `hcso_elb_certificate`
+  + `hcso_elb_flavors`
+  + `hcso_elb_ipgroups`
+  + `hcso_elb_l7policies`
+  + `hcso_elb_l7rules`
+  + `hcso_elb_listeners`
+  + `hcso_elb_loadbalancers`
+  + `hcso_elb_logtanks`
+  + `hcso_elb_members`
+  + `hcso_elb_pools`
+  + `hcso_elb_security_policies`
+  + `hcso_mapreduce_clusters`
+  + `hcso_nat_gateway`
+  + `hcso_rds_backups`
+  + `hcso_rds_engine_versions`
+  + `hcso_rds_flavors`
+  + `hcso_rds_instances`
+  + `hcso_rds_mysql_accounts`
+  + `hcso_rds_mysql_databases`
+  + `hcso_rds_parametergroups`
+  + `hcso_rds_pg_plugins`
+  + `hcso_rds_sqlserver_collations`
+  + `hcso_rds_storage_types`
+  + `hcso_servicestage_component_runtimes`
+  + `hcso_sfs_turbos`
+  + `hcso_smn_message_templates`
+  + `hcso_smn_topics`
+
 ## 0.1.0 (January 19, 2024)
 
 * **New Resource:**
