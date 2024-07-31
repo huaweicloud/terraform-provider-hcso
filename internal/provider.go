@@ -38,6 +38,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
 	myconfig "github.com/huaweicloud/terraform-provider-hcso/internal/config"
+	myvpc "github.com/huaweicloud/terraform-provider-hcso/internal/services/vpc"
 )
 
 const (
@@ -381,6 +382,9 @@ func Provider() *schema.Provider {
 			"hcso_vpcs":                   vpc.DataSourceVpcs(),
 			"hcso_vpc_subnet_ids":         vpc.DataSourceVpcSubnetIdsV1(),
 			"hcso_vpc_subnets":            vpc.DataSourceVpcSubnets(),
+			"hcso_vpc_network_acls":       myvpc.DataSourceNetworkAcls(),
+			"hcso_vpc_route_table":        vpc.DataSourceVPCRouteTable(),
+			"hcso_vpc_routes":             myvpc.DataSourceVpcRoutes(),
 			"hcso_networking_port":        vpc.DataSourceNetworkingPortV2(),
 			"hcso_vpc_peering_connection": vpc.DataSourceVpcPeeringConnectionV2(),
 			"hcso_networking_secgroups":   vpc.DataSourceNetworkingSecGroups(),
@@ -489,6 +493,9 @@ func Provider() *schema.Provider {
 			"hcso_vpc_subnet":                      vpc.ResourceVpcSubnetV1(),
 			"hcso_vpc_peering_connection":          vpc.ResourceVpcPeeringConnectionV2(),
 			"hcso_vpc_peering_connection_accepter": vpc.ResourceVpcPeeringConnectionAccepterV2(),
+			"hcso_vpc_network_acl":                 myvpc.ResourceNetworkAcl(),
+			"hcso_vpc_route_table":                 vpc.ResourceVPCRouteTable(),
+			"hcso_vpc_route":                       vpc.ResourceVPCRouteTableRoute(),
 			"hcso_networking_secgroup":             vpc.ResourceNetworkingSecGroup(),
 			"hcso_networking_secgroup_rule":        vpc.ResourceNetworkingSecGroupRule(),
 			"hcso_networking_vip":                  vpc.ResourceNetworkingVip(),

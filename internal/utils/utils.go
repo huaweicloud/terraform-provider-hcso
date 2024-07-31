@@ -542,3 +542,20 @@ func SchemaDesc(description string, schemaDescInput SchemaDescInput) string {
 
 	return description
 }
+
+func ValueIgnoreEmpty(v interface{}) interface{} {
+	vl := reflect.ValueOf(v)
+	if !vl.IsValid() {
+		return v
+	}
+
+	if (vl.Kind() != reflect.Bool) && vl.IsZero() {
+		return nil
+	}
+
+	if (vl.Kind() == reflect.Array || vl.Kind() == reflect.Slice) && vl.Len() == 0 {
+		return nil
+	}
+
+	return v
+}
