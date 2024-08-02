@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 0.3.0 (August 2, 2024)
+
+* **New Resource:**
+  + `hcso_vpc_network_acl`
+  + `hcso_vpc_route_table`
+  + `hcso_vpc_route`
+
+* **New Data Source:**
+  + `hcso_vpc_network_acls`
+  + `hcso_vpc_route_table`
+  + `hcso_vpc_routes`
+
 ## 0.2.0 (April 29, 2024)
 
 * **New Resource:**
