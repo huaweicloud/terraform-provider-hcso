@@ -37,7 +37,7 @@ import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/tms"
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/services/vpc"
 
-	"github.com/huaweicloud/terraform-provider-hcso/internal/hcso_config"
+	myconfig "github.com/huaweicloud/terraform-provider-hcso/internal/config"
 )
 
 const (
@@ -626,7 +626,7 @@ func configureProvider(_ context.Context, d *schema.ResourceData, terraformVersi
 		identityEndpoint = fmt.Sprintf("https://iam.%s.%s/v3", region, cloud)
 	}
 
-	hcsoConfig := hcso_config.HCSOConfig{
+	hcsoConfig := myconfig.HCSOConfig{
 		Config: config.Config{
 			AccessKey:           d.Get("access_key").(string),
 			SecretKey:           d.Get("secret_key").(string),

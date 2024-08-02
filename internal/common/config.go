@@ -8,7 +8,7 @@ import (
 
 	"github.com/chnsz/golangsdk"
 
-	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
+	"github.com/huaweicloud/terraform-provider-hcso/internal/config"
 )
 
 // NewCustomClient creates a custom client assembled from user-provided endpoints.

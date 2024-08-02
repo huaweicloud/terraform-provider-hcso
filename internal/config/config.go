@@ -1,4 +1,4 @@
-package hcso_config
+package config
 
 import (
 	"github.com/huaweicloud/terraform-provider-huaweicloud/huaweicloud/config"
