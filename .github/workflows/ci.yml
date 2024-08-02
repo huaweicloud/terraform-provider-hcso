@@ -64,10 +64,10 @@ jobs:
   # + V014: custom SchemaValidateFunc should be replaced with validation.IntInSlice() or validation.IntNotInSlice()
   tfproviderlint:
     runs-on: ubuntu-latest
-
+    env:
+      GOFLAGS: "-buildvcs=false"
     steps:
       - uses: actions/checkout@v3
-
       - uses: bflad/tfproviderlint-github-action@master
         with:
           args: -R019=false -S018=false -V011=false -V012=false -V013=false -V014=false ./...
