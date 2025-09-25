@@ -1,9 +1,13 @@
+> [!WARNING]
+> This provider is no longer maintained; no bug fixes or new releases will be provided.
+> We recommend switching to the [HuaweiCloud provider](https://registry.terraform.io/providers/huaweicloud/huaweicloud/latest).
+
 Huawei Cloud Stack Online Provider
 ==============================
 
 <!-- markdownlint-disable-next-line MD034 -->
 * Website: https://www.terraform.io
-* [![Documentation](https://img.shields.io/badge/documentation-blue)](https://registry.terraform.io/providers/huaweicloud/huaweicloud/latest/docs)
+* [![Documentation](https://img.shields.io/badge/documentation-blue)](https://registry.terraform.io/providers/huaweicloud/hcso/latest/docs)
 * [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 * Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
 
