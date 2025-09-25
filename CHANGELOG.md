@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.1 (September 25, 2025)
+
+This provider is no longer maintained; no bug fixes or new releases will be provided.
+We recommend switching to the [HuaweiCloud provider](https://registry.terraform.io/providers/huaweicloud/huaweicloud/latest).
+
 ## 0.3.0 (August 2, 2024)
 
 * **New Resource:**

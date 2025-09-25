@@ -1,5 +1,8 @@
 # HUAWEI CLOUD Stack Online Provider
 
+!> **WARNING:** This provider is no longer maintained; no bug fixes or new releases will be provided.
+We recommend switching to the [HuaweiCloud provider](https://registry.terraform.io/providers/huaweicloud/huaweicloud/latest).
+
 The HUAWEI CLOUD Stack Online provider is used to interact with the many resources supported by HUAWEI CLOUD Stack
 Online. The provider needs to be configured with the proper credentials before it can be used.
 
